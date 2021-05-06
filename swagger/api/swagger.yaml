@@ -1,0 +1,4249 @@
+openapi: 3.0.3
+info:
+  title: MangaDex API
+  description: "MangaDex is an ad-free manga reader offering high-quality images!\n\
+    \nHere is some generic stuff about the API\n\n# Authentication\n\nYou can login\
+    \ with `/auth/login` endpoints. It will return a JWT that remains for 15min and\
+    \ that have a 4h refresh token.\n\n# Rating limits\n\nWe are using rating limits\
+    \ in order to avoid too much calls on our endpoints, here is how is it configured:\n\
+    \n| Endpoint                | Calls            | Time frame                |\n\
+    |-------------------------|------------------|---------------------------|\n|\
+    \ `/account/create` | 1 | 60 minutes |\n| `/account/activate/{code}` | 30 | 60\
+    \ minutes |\n| `/account/activate/resend`, `/account/recover`, `/account/recover/{code}`\
+    \ | 5 | 60 minutes |\n| `/auth/login` | 30 | 60 minutes |\n| `/auth/refresh` |\
+    \ 30 | 60 minutes |\n| `/chapter/{id}/read` | 300              | 10 minutes  \
+    \              |\n| `/upload/begin`, `/upload/{id}`, `/upload/{id}/commit` | 30\
+    \               | 1 minute                  |\n| `PUT /chapter/{id}` | 10    \
+    \           | 1 minute                  |\n| `DELETE /chapter/{id}` | 10     \
+    \          | 1 minute                  |\n| `POST /manga` | 10               |\
+    \ 60 minutes                |\n| `PUT /manga/{id}` | 10               | 1 minute\
+    \                  |\n| `DELETE /manga/{id}` | 10               | 10 minutes \
+    \               |\n| `POST /group` | 10               | 60 minutes           \
+    \     |\n| `PUT /group/{id}` | 10               | 1 minute                  |\n\
+    | `DELETE /group/{id}` | 10               | 10 minutes                |\n| `POST\
+    \ /author` | 10               | 60 minutes                |\n| `PUT /author` |\
+    \ 10               | 1 minutes                 |\n| `DELETE /author/{id}` | 10\
+    \               | 10 minutes                |\n| `POST /captcha/solve` | 10 |\
+    \ 10 minutes |\n\nYou can get details about how your rate limit is going by reading\
+    \ following headers:\n\n| Header                  | Description              \
+    \                                |\n|-------------------------|-----------------------------------------------------------|\n\
+    | X-RateLimit-Limit       | Number of max requests allowed in the current time\
+    \ period |\n| X-RateLimit-Remaining   | Number of remaining requests in the current\
+    \ time period   |\n| X-RateLimit-Retry-After | Timestamp of end of current time\
+    \ period as UNIX timestamp |\n\n# Captchas\n\nSome endpoints may require captchas\
+    \ to proceed, in order to slow down automated malicious traffic. Regular users\
+    \ might see a couple of captchas, based on the frequency of write requests or\
+    \ on certain endpoints like user signup.\n\nOnce an endpoint decides that a captcha\
+    \ needs to be solved, a 403 Forbidden response will be returned, where the error\
+    \ title is `captcha_required_exception`.\nThe sitekey needed for recaptcha to\
+    \ function is provided in both the `X-Captcha-Sitekey` header field, as well as\
+    \ in the error context, specified as the `siteKey` parameter.\n\nThe captcha result\
+    \ of the client can either be passed into the repeated original request with the\
+    \ `X-Captcha-Result` header or alternatively the `POST /captcha/solve` endpoint\
+    \ can be called to solve this captcha. The time a solved captcha is remembered\
+    \ varies across different endpoints and can also be influenced by individual client\
+    \ behavior.\n\nAuthentication is not required for the `POST /captcha/solve` endpoint,\
+    \ captchas are tracked separately for client ip and user id. If you are logged\
+    \ in, you want to send the session token so you validate the captcha for your\
+    \ client ip and user id at the same time, but it is not required.\n\n# Chapter\
+    \ pages processing\n\n## Pages processing\n\nWhen you fetch a chapter response\
+    \ you'll have 4 fields that you need for pages processing:\n\n| Field        \
+    \               | Type     | Description        |\n|-----------------------------|----------|--------------------|\n\
+    | `data.id`                   | `string` | API identifier     |\n| `data.attributes.hash`\
+    \      | `string` | MD@H identifier    |\n| `data.attributes.data`      | `array`\
+    \  | High quality pages |\n| `data.attributes.dataSaver` | `array`  | Low quality\
+    \ pages  |\n\nFrom this point you miss one thing: a MD@H backend server to get\
+    \ images from, to get that make a request to `GET /at-home/server/{data.id}`,\
+    \ it will return the server url to use.\n\nThen to build the pages, you have to\
+    \ build your url as following:\n`https://{md@h server node}/data/{data.attributes.hash}/{data.attributes.data}`\n\
+    \nOr if you want to use the low quality files:\n`https://{md@h server node}/data-saver/{data.attributes.hash}/{data.attributes.dataSaver}`\n\
+    \nHere is an example of what the url could looks like:\n\n| Field            \
+    \           | Value |\n|-----------------------------|-------|\n| `data.id`  \
+    \                 | `000002b1-e8de-4281-9781-8e81e869f579` |\n| `data.attributes.hash`\
+    \      | `caad0c22434276b9e3e56a78fe2e7993` |\n| `data.attributes.data`      |\
+    \ `[\"x1-a87ae6522fa5c244fd76985c7d953ccf3975bec66ce9b8e813549e642b38a47a.png\"\
+    , ...]` |\n| `data.attributes.dataSaver` | `[\"x1-a1d3047dfccd77b3117a86ccf19a9c5403e09baec6a78893ed1d3825d2c71256.jpg\"\
+    , ...]` |\n\nAs a \"fake\" MD@H node we'll use `https://s2.mangadex.org/` server.\n\
+    \nSo for high quality we'll have an URL like that: https://s2.mangadex.org/data/caad0c22434276b9e3e56a78fe2e7993/x1-a87ae6522fa5c244fd76985c7d953ccf3975bec66ce9b8e813549e642b38a47a.png\n\
+    \nAnd for low quality: https://s2.mangadex.org/data-saver/caad0c22434276b9e3e56a78fe2e7993/x1-a1d3047dfccd77b3117a86ccf19a9c5403e09baec6a78893ed1d3825d2c71256.jpg\n\
+    \n## Report\n\nIn order to make everything works well, we keep statistics over\
+    \ MD@H nodes and how they perform. In order to keep theses statistics you have\
+    \ to post data for each page you fetch from a MD@H node.\n\nHere is an example:\n\
+    ```curl\nPOST https://api.mangadex.network/report\n{\n  \"url\": \"https://s2.mangadex.org/data/caad0c22434276b9e3e56a78fe2e7993/x1-a87ae6522fa5c244fd76985c7d953ccf3975bec66ce9b8e813549e642b38a47a.png\"\
+    ,\n  \"success\": true,\n  \"bytes\": 800000, // size of the loaded image\n  \"\
+    duration\": 213, // miliseconds to load the image\n  \"cached\": false, // X-Cache\
+    \ header of the MDAH node == 'HIT' ?\n}\n```\n\n# Static data\n\n## Manga publication\
+    \ demographic\n\n| Value            | Description               |\n|------------------|---------------------------|\n\
+    | shonen           | Manga is a Shonen         |\n| shoujo           | Manga is\
+    \ a Shoujo         |\n| josei            | Manga is a Josei          |\n| seinen\
+    \           | Manga is a Seinen         |\n\n## Manga status\n\n| Value      \
+    \      | Description               |\n|------------------|---------------------------|\n\
+    | ongoing          | Manga is still going on   |\n| completed        | Manga is\
+    \ completed        |\n| hiatus           | Manga is paused           |\n| abandoned\
+    \        | Manga has been abandoned  |\n\n## Manga reading status\n\n| Value \
+    \           |\n|------------------|\n| reading          |\n| on_hold         \
+    \ |\n| plan\\_to\\_read   |\n| dropped          |\n| re\\_reading      |\n| completed\
+    \        |\n\n## Manga content rating\n\n| Value            | Description    \
+    \           |\n|------------------|---------------------------|\n| safe      \
+    \       | Safe content              |\n| suggestive       | Suggestive content\
+    \        |\n| erotica          | Erotica content           |\n| pornographic \
+    \    | Pornographic content      |\n\n## CustomList visibility\n\n| Value    \
+    \        | Description               |\n|------------------|---------------------------|\n\
+    | public           | CustomList is public      |\n| private          | CustomList\
+    \ is private     |\n\n## Relationship types\n\n| Value            | Description\
+    \                    |\n|------------------|--------------------------------|\n\
+    | manga            | Manga resource                 |\n| chapter          | Chapter\
+    \ resource               |\n| author           | Author resource             \
+    \   |\n| artist           | Author resource (drawers only) |\n| scanlation_group\
+    \ | ScanlationGroup resource       |\n| tag              | Tag resource      \
+    \             |\n| user             | User resource                  |\n| custom_list\
+    \      | CustomList resource            |"
+  contact:
+    name: MangaDex staff team
+    email: mangadexstaff@gmail.com
+  version: 5.0.0
+servers:
+- url: https://api.mangadex.org
+  description: MangaDex Api
+security:
+- Bearer: []
+tags:
+- name: Manga
+- name: Author
+- name: Search
+- name: Auth
+- name: ScanlationGroup
+- name: Feed
+- name: CustomList
+- name: Captcha
+- name: AtHome
+- name: Legacy
+- name: Infrastructure
+paths:
+  /ping:
+    get:
+      tags:
+      - Infrastructure
+      summary: Ping the server
+      responses:
+        "200":
+          description: Pong
+          content:
+            application/json:
+              schema:
+                type: string
+                default: pong
+                x-content-type: application/json
+      security: []
+  /manga:
+    get:
+      tags:
+      - Manga
+      - Search
+      summary: Manga list
+      description: Search a list of Manga.
+      operationId: get-search-manga
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: title
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: authors
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: artists
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: year
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: includedTags
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: includedTagsMode
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: AND
+          enum:
+          - AND
+          - OR
+      - name: excludedTags
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: excludedTagsMode
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: OR
+          enum:
+          - AND
+          - OR
+      - name: status
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ongoing
+            - completed
+            - hiatus
+            - abandoned
+      - name: originalLanguage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            pattern: "^[a-zA-Z\\-]{2,5}$"
+            type: string
+      - name: publicationDemographic
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - shonen
+            - shoujo
+            - josei
+            - seinen
+            - none
+      - name: ids
+        in: query
+        description: Manga ids (limited to 100 per request)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: contentRating
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - safe
+            - suggestive
+            - erotica
+            - pornographic
+      - name: createdAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: updatedAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: order
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/order'
+      responses:
+        "200":
+          description: Manga list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaList'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+    post:
+      tags:
+      - Manga
+      summary: Create Manga
+      description: Create a new Manga.
+      operationId: post-manga
+      requestBody:
+        description: This body is limited to 16kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MangaCreate'
+      responses:
+        "200":
+          description: Manga Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /manga/{id}:
+    get:
+      tags:
+      - Manga
+      summary: View Manga
+      description: View Manga.
+      operationId: get-manga-id
+      parameters:
+      - name: id
+        in: path
+        description: Manga ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaResponse'
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+    put:
+      tags:
+      - Manga
+      summary: Update Manga
+      operationId: put-manga-id
+      parameters:
+      - name: id
+        in: path
+        description: Manga ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: This body is limited to 16kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MangaEdit'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Manga
+      summary: Delete Manga
+      operationId: delete-manga-id
+      parameters:
+      - name: id
+        in: path
+        description: Manga ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Manga has been deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login
+      operationId: post-auth-login
+      requestBody:
+        description: This body is limited to 2kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+      security: []
+  /auth/check:
+    get:
+      tags:
+      - Auth
+      summary: Check token
+      operationId: get-auth-check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckResponse'
+  /auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Logout
+      operationId: post-auth-logout
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+        "503":
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/refresh:
+    post:
+      tags:
+      - Auth
+      summary: Refresh token
+      operationId: post-auth-refresh
+      requestBody:
+        description: This body is limited to 2kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+      security: []
+  /account/create:
+    post:
+      tags:
+      - Account
+      summary: Create Account
+      operationId: post-account-create
+      requestBody:
+        description: This body is limited to 4kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccount'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /account/activate/{code}:
+    get:
+      tags:
+      - Account
+      summary: Activate account
+      operationId: get-account-activate-code
+      parameters:
+      - name: code
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: "[0-9a-fA-F-]+"
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountActivateResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /group:
+    get:
+      tags:
+      - ScanlationGroup
+      - Search
+      summary: Scanlation Group list
+      operationId: get-search-group
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: ids
+        in: query
+        description: ScanlationGroup ids (limited to 100 per request)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanlationGroupList'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+    post:
+      tags:
+      - ScanlationGroup
+      summary: Create Scanlation Group
+      operationId: post-group
+      requestBody:
+        description: This body is limited to 8kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScanlationGroup'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanlationGroupResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /group/{id}:
+    get:
+      tags:
+      - ScanlationGroup
+      summary: View Scanlation Group
+      operationId: get-group-id
+      parameters:
+      - name: id
+        in: path
+        description: Scanlation Group ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanlationGroupResponse'
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+    put:
+      tags:
+      - ScanlationGroup
+      summary: Update Scanlation Group
+      operationId: put-group-id
+      parameters:
+      - name: id
+        in: path
+        description: Scanlation Group ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: This body is limited to 8kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanlationGroupEdit'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanlationGroupResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - ScanlationGroup
+      summary: Delete Scanlation Group
+      operationId: delete-group-id
+      parameters:
+      - name: id
+        in: path
+        description: Scanlation Group ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /group/{id}/follow:
+    post:
+      tags:
+      - ScanlationGroup
+      summary: Follow Scanlation Group
+      operationId: post-group-id-follow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - ScanlationGroup
+      summary: Unfollow Scanlation Group
+      operationId: delete-group-id-follow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /list:
+    post:
+      tags:
+      - CustomList
+      summary: Create CustomList
+      operationId: post-list
+      requestBody:
+        description: This body is limited to 8kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomListCreate'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomListResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /list/{id}:
+    get:
+      tags:
+      - CustomList
+      summary: Get CustomList
+      operationId: get-list-id
+      parameters:
+      - name: id
+        in: path
+        description: CustomList ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomListResponse'
+        "204":
+          description: No Content
+    put:
+      tags:
+      - CustomList
+      summary: Update CustomList
+      description: This body is limited to 8kb max per call.
+      operationId: put-list-id
+      parameters:
+      - name: id
+        in: path
+        description: CustomList ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomListEdit'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomListResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - CustomList
+      summary: Delete CustomList
+      operationId: delete-list-id
+      parameters:
+      - name: id
+        in: path
+        description: CustomList ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /manga/{id}/list/{listId}:
+    post:
+      tags:
+      - Manga
+      - CustomList
+      summary: Add Manga in CustomList
+      operationId: post-manga-id-list-listId
+      parameters:
+      - name: id
+        in: path
+        description: Manga ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      - name: listId
+        in: path
+        description: CustomList ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - CustomList
+      - Manga
+      summary: Remove Manga in CustomList
+      operationId: delete-manga-id-list-listId
+      parameters:
+      - name: id
+        in: path
+        description: Manga ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      - name: listId
+        in: path
+        description: CustomList ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/list:
+    get:
+      tags:
+      - CustomList
+      summary: Get logged User CustomList list
+      description: 'This will list public and private CustomList '
+      operationId: get-user-list
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomListList'
+  /user/{id}/list:
+    get:
+      tags:
+      - CustomList
+      summary: Get User's CustomList list
+      description: This will list only public CustomList
+      operationId: get-user-id-list
+      parameters:
+      - name: id
+        in: path
+        description: User ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomListList'
+  /user/{id}:
+    get:
+      tags:
+      - User
+      summary: Get User
+      operationId: get-user-id
+      parameters:
+      - name: id
+        in: path
+        description: User ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+  /chapter:
+    get:
+      tags:
+      - Chapter
+      - Search
+      summary: Chapter list
+      description: "Chapter list, if you want Chapters for a given Manga, please check\
+        \ at feeds endpoints."
+      operationId: get-chapter
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: ids
+        in: query
+        description: Chapter ids (limited to 100 per request)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: title
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: groups
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: uploader
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uuid
+      - name: manga
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uuid
+      - name: volume
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: chapter
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: translatedLanguage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^[a-zA-Z\\-]{2,5}$"
+          type: string
+      - name: createdAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: updatedAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: publishAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: order
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/order_1'
+      responses:
+        "200":
+          description: Chapter list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChapterList'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /chapter/{id}:
+    get:
+      tags:
+      - Chapter
+      summary: Get Chapter
+      operationId: get-chapter-id
+      parameters:
+      - name: id
+        in: path
+        description: Chapter ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChapterResponse'
+              examples:
+                example-1:
+                  value:
+                    result: ok
+                    data:
+                      id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                      type: chapter
+                      attributes:
+                        title: string
+                        translatedLanguage: jp
+                        pages:
+                        - string
+                        checksums:
+                        - property1: string
+                          property2: string
+                        uploader: 4df808f4-cdf8-4d1c-80e6-4af8e6ce09b8
+                        version: 1
+                        groups:
+                        - 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                        manga: e7116dd3-e4ad-4d10-a3ef-6a64d730c341
+                    relationships:
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                      type: string
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+    put:
+      tags:
+      - Chapter
+      summary: Update Chapter
+      operationId: put-chapter-id
+      parameters:
+      - name: id
+        in: path
+        description: Chapter ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: This body is limited to 32kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChapterEdit'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChapterResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Manga
+      summary: Delete Chapter
+      operationId: delete-chapter-id
+      parameters:
+      - name: id
+        in: path
+        description: Chapter ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Chapter has been deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/follows/manga/feed:
+    get:
+      tags:
+      - Manga
+      - Feed
+      summary: Get logged User followed Manga feed
+      operationId: get-user-follows-manga-feed
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 500
+          type: integer
+          default: 100
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: locales
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            pattern: "^[a-zA-Z\\-]{2,5}$"
+            type: string
+      - name: createdAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: updatedAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: publishAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChapterList'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+  /list/{id}/feed:
+    get:
+      tags:
+      - CustomList
+      - Feed
+      summary: CustomList Manga feed
+      operationId: get-list-id-feed
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 500
+          type: integer
+          default: 100
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: locales
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            pattern: "^[a-zA-Z\\-]{2,5}$"
+            type: string
+      - name: createdAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: updatedAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: publishAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChapterList'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /manga/{id}/follow:
+    post:
+      tags:
+      - Manga
+      summary: Follow Manga
+      operationId: post-manga-id-follow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Manga
+      summary: Unfollow Manga
+      operationId: delete-manga-id-follow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /author:
+    get:
+      tags:
+      - Author
+      - Search
+      summary: Author list
+      operationId: get-author
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: ids
+        in: query
+        description: Author ids (limited to 100 per request)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorList'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+    post:
+      tags:
+      - Author
+      summary: Create Author
+      operationId: post-author
+      requestBody:
+        description: This body is limited to 2kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorCreate'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /author/{id}:
+    get:
+      tags:
+      - Author
+      summary: Get Author
+      operationId: get-author-id
+      parameters:
+      - name: id
+        in: path
+        description: Author ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+    put:
+      tags:
+      - Author
+      summary: Update Author
+      operationId: put-author-id
+      parameters:
+      - name: id
+        in: path
+        description: Author ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: This body is limited to 2kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorEdit'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Author
+      summary: Delete Author
+      operationId: delete-author-id
+      parameters:
+      - name: id
+        in: path
+        description: Author ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /legacy/mapping:
+    post:
+      tags:
+      - Legacy
+      summary: Legacy ID mapping
+      operationId: post-legacy-mapping
+      requestBody:
+        description: This body is limited to 10kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MappingIdBody'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MappingIdResponse'
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /manga/{id}/feed:
+    get:
+      tags:
+      - Manga
+      summary: Manga feed
+      operationId: get-manga-id-feed
+      parameters:
+      - name: id
+        in: path
+        description: Manga ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 500
+          type: integer
+          default: 100
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: locales
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            pattern: "^[a-zA-Z\\-]{2,5}$"
+            type: string
+      - name: createdAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: updatedAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      - name: publishAtSince
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
+          type: string
+          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChapterList'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /manga/{id}/read:
+    get:
+      tags:
+      - Manga
+      summary: Manga read markers
+      description: A list of chapter ids that are marked as read for the specified
+        manga
+      operationId: get-manga-chapter-readmarkers
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              examples:
+                example-1:
+                  value:
+                    result: ok
+                    data:
+                    - 00057883-357b-4734-9469-52967e59ef4c
+                    - 000b7978-d9bd-49ec-a8f6-a0737368415f
+                    - 0015b621-a175-47f5-81fb-5976c88e18c4
+  /chapter/{id}/read:
+    post:
+      tags:
+      - Chapter
+      summary: Mark Chapter read
+      description: Mark chapter as read for the current user
+      operationId: chapter-id-read
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+    delete:
+      tags:
+      - Chapter
+      summary: Mark Chapter unread
+      description: Mark chapter as unread for the current user
+      operationId: chapter-id-unread
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+  /manga/random:
+    get:
+      tags:
+      - Manga
+      summary: Get a random Manga
+      operationId: get-manga-random
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaResponse'
+      security: []
+  /at-home/server/{chapterId}:
+    get:
+      tags:
+      - AtHome
+      summary: Get MD@Home node URL
+      operationId: get-at-home-server-chapterId
+      parameters:
+      - name: chapterId
+        in: path
+        description: Chapter ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      - name: ssl
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_2'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /manga/tag:
+    get:
+      tags:
+      - Manga
+      summary: Tag list
+      operationId: get-manga-tag
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagResponse'
+                x-content-type: application/json
+      security: []
+  /account/activate/resend:
+    post:
+      tags:
+      - Account
+      summary: Resend Activation code
+      operationId: post-account-activate-resend
+      requestBody:
+        description: This body is limited to 1kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendAccountActivationCode'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountActivateResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /account/recover:
+    post:
+      tags:
+      - Account
+      summary: Recover given Account
+      operationId: post-account-recover
+      requestBody:
+        description: This body is limited to 1kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendAccountActivationCode'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountActivateResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/'
+      security: []
+  /account/recover/{code}:
+    post:
+      tags:
+      - Account
+      summary: Complete Account recover
+      operationId: post-account-recover-code
+      parameters:
+      - name: code
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: This body is limited to 2kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoverCompleteBody'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountActivateResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /user/me:
+    get:
+      tags:
+      - User
+      summary: Logged User details
+      operationId: get-user-me
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+  /user/follows/group:
+    get:
+      tags:
+      - ScanlationGroup
+      - User
+      summary: Get logged User followed Groups
+      operationId: get-user-follows-group
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanlationGroupList'
+  /user/follows/user:
+    get:
+      tags:
+      - User
+      summary: Get logged User followed User list
+      operationId: get-user-follows-user
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+  /user/follows/manga:
+    get:
+      tags:
+      - Manga
+      - User
+      summary: Get logged User followed Manga list
+      operationId: get-user-follows-manga
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 100
+          type: integer
+          default: 10
+      - name: offset
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaList'
+  /manga/status:
+    get:
+      tags:
+      - Manga
+      summary: Get all Manga reading status for logged User
+      operationId: get-manga-status
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_3'
+  /manga/{id}/status:
+    post:
+      tags:
+      - Manga
+      summary: Update Manga reading status
+      operationId: post-manga-id-status
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: Using a `null` value in `status` field will remove the Manga
+          reading status. This body is limited to 2kb max per call.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMangaStatus'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /captcha/solve:
+    post:
+      tags:
+      - Captcha
+      summary: Solve Captcha
+      description: "Captchas can be solved explicitly through this endpoint, another\
+        \ way is to add a `X-Captcha-Result` header to any request. The same logic\
+        \ will verify the captcha and is probably more convenient because it takes\
+        \ one less request.\n\nAuthentication is optional. Captchas are tracked for\
+        \ both the client ip and for the user id, if you are logged in you want to\
+        \ send your session token but that is not required."
+      operationId: post-captcha-solve
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body'
+            examples:
+              example-1:
+                value:
+                  captchaChallenge: string
+      responses:
+        "200":
+          description: "OK: Captcha has been solved"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: "Bad Request: Captcha challenge result was wrong, the Captcha\
+            \ Verification service was down or other, refer to the error message and\
+            \ the errorCode inside the error context"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - Bearer: []
+components:
+  schemas:
+    MangaRequest:
+      title: MangaRequest
+      type: object
+      properties:
+        title:
+          $ref: '#/components/schemas/LocalizedString'
+        altTitles:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocalizedString'
+        description:
+          $ref: '#/components/schemas/LocalizedString'
+        authors:
+          type: array
+          items:
+            type: string
+            format: uuid
+        artists:
+          type: array
+          items:
+            type: string
+            format: uuid
+        links:
+          type: array
+          additionalProperties:
+            type: string
+          items:
+            type: object
+        originalLanguage:
+          pattern: "^[a-zA-Z\\-]{2,5}$"
+          type: string
+        lastVolume:
+          minimum: 0
+          type: integer
+          nullable: true
+        lastChapter:
+          minimum: 0
+          type: integer
+          nullable: true
+        publicationDemographic:
+          type: string
+          nullable: true
+          enum:
+          - shonen
+          - shoujo
+          - josei
+          - seinen
+        status:
+          type: string
+          nullable: true
+          enum:
+          - ongoing
+          - completed
+          - hiatus
+          - abandoned
+        year:
+          maximum: 9999
+          minimum: 1
+          type: integer
+        contentRating:
+          type: string
+          nullable: true
+          enum:
+          - hentai
+          - ecchi
+        modNotes:
+          type: string
+          nullable: true
+        version:
+          minimum: 1
+          type: integer
+    LocalizedString:
+      title: LocalizedString
+      type: object
+      additionalProperties:
+        pattern: "^[a-z]{2,8}$"
+        type: string
+      x-schema-name: LocalizedString
+    MangaResponse:
+      title: MangaResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+          - ko
+        data:
+          $ref: '#/components/schemas/Manga'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+      example:
+        result: ok
+        relationships:
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        data:
+          attributes:
+            lastVolume: lastVolume
+            year: 0
+            description:
+              key: description
+            title:
+              key: title
+            originalLanguage: originalLanguage
+            lastChapter: lastChapter
+            version: 1
+            tags:
+            - ""
+            - ""
+            altTitles:
+            - ""
+            - ""
+            publicationDemographic: publicationDemographic
+            createdAt: createdAt
+            isLocked: true
+            links:
+            - ""
+            - ""
+            contentRating: contentRating
+            status: status
+            updatedAt: updatedAt
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: manga
+    ChapterResponse:
+      title: ChapterResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+          - ko
+        data:
+          $ref: '#/components/schemas/Chapter'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+      example:
+        result: ok
+        relationships:
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        data:
+          attributes:
+            volume: 0
+            chapter: chapter
+            createdAt: createdAt
+            data:
+            - data
+            - data
+            uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            publishAt: publishAt
+            translatedLanguage: translatedLanguage
+            title: title
+            version: 1
+            hash: hash
+            dataSaver:
+            - dataSaver
+            - dataSaver
+            updatedAt: updatedAt
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: chapter
+    Relationship:
+      title: Relationship
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+      example:
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: type
+    Chapter:
+      title: Chapter
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - chapter
+        attributes:
+          $ref: '#/components/schemas/ChapterAttributes'
+      example:
+        attributes:
+          volume: 0
+          chapter: chapter
+          createdAt: createdAt
+          data:
+          - data
+          - data
+          uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          publishAt: publishAt
+          translatedLanguage: translatedLanguage
+          title: title
+          version: 1
+          hash: hash
+          dataSaver:
+          - dataSaver
+          - dataSaver
+          updatedAt: updatedAt
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: chapter
+      x-examples:
+        example:
+          id: a05de006-df86-4fe1-9d20-32664a78c1cc
+          type: chapter
+          attributes:
+            title: Chapter title
+            volume: 1
+            chapter: "15.1"
+            uploader:
+              id: 23d52040-3a77-4ffe-84dd-6dbf259e32ed
+              type: user
+              attributes: []
+            manga:
+              id: 439ea5a9-e922-44d1-b9c1-a3e1158bd55f
+              type: manga
+              attributes: []
+            groups:
+            - id: cb4cf9ac-ee21-486f-ab0f-21b17ba0ab7f
+              type: scanlation_group
+              attributes: []
+            translatedLanguage: en
+            pages:
+            - 1.jpg
+            - 2.jpg
+            - 3.jpg
+            checksums:
+              default:
+                "1.jpg": 64a0f5b9d22053b311f1d34cae7183763281350354f2a0b0e552315c38843e0f
+                "2.jpg": 64a0f5b9d22053b311f1d34cae7183763281350354f2a0b0e552315c38843e0f
+                "3.jpg": 64a0f5b9d22053b311f1d34cae7183763281350354f2a0b0e552315c38843e0f
+              data-saver:
+                "1.jpg": 64a0f5b9d22053b311f1d34cae7183763281350354f2a0b0e552315c38843e0f
+                "2.jpg": 64a0f5b9d22053b311f1d34cae7183763281350354f2a0b0e552315c38843e0f
+                "3.jpg": 64a0f5b9d22053b311f1d34cae7183763281350354f2a0b0e552315c38843e0f
+            version: 1
+    Manga:
+      title: Manga
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - manga
+        attributes:
+          $ref: '#/components/schemas/MangaAttributes'
+      example:
+        attributes:
+          lastVolume: lastVolume
+          year: 0
+          description:
+            key: description
+          title:
+            key: title
+          originalLanguage: originalLanguage
+          lastChapter: lastChapter
+          version: 1
+          tags:
+          - ""
+          - ""
+          altTitles:
+          - ""
+          - ""
+          publicationDemographic: publicationDemographic
+          createdAt: createdAt
+          isLocked: true
+          links:
+          - ""
+          - ""
+          contentRating: contentRating
+          status: status
+          updatedAt: updatedAt
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: manga
+      x-examples:
+        example:
+          id: a05de006-df86-4fe1-9d20-32664a78c1cc
+          type: manga
+          attributes:
+            title:
+              en: English title
+              de: Deutscher Titel
+              jp: 日本語題名
+            altTitles:
+            - en: Secondary english title
+            - en: Third english title
+            - romaji: Romaji title
+            description:
+              en: Nice description
+            isLocked: false
+            originalLanguage: jp
+            year: 2020
+            version: 1
+    ErrorResponse:
+      title: ErrorResponse
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      title: Error
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        detail:
+          type: string
+    ChapterAttributes:
+      title: ChapterAttributes
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          type: string
+        volume:
+          minimum: 0
+          type: integer
+          nullable: true
+        chapter:
+          maxLength: 8
+          type: string
+          nullable: true
+        translatedLanguage:
+          pattern: "^[a-zA-Z\\-]{2,5}$"
+          type: string
+        hash:
+          type: string
+        data:
+          type: array
+          items:
+            type: string
+        dataSaver:
+          type: array
+          items:
+            type: string
+        uploader:
+          type: string
+          format: uuid
+        version:
+          minimum: 1
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        publishAt:
+          type: string
+      example:
+        volume: 0
+        chapter: chapter
+        createdAt: createdAt
+        data:
+        - data
+        - data
+        uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        publishAt: publishAt
+        translatedLanguage: translatedLanguage
+        title: title
+        version: 1
+        hash: hash
+        dataSaver:
+        - dataSaver
+        - dataSaver
+        updatedAt: updatedAt
+    MangaAttributes:
+      title: MangaAttributes
+      type: object
+      properties:
+        title:
+          type: object
+          additionalProperties:
+            type: string
+        altTitles:
+          type: array
+          items: {}
+        description:
+          type: object
+          additionalProperties:
+            type: string
+        isLocked:
+          type: boolean
+        links:
+          type: array
+          nullable: true
+          items: {}
+        originalLanguage:
+          type: string
+        lastVolume:
+          type: string
+          nullable: true
+        lastChapter:
+          type: string
+          nullable: true
+        publicationDemographic:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        year:
+          type: integer
+        contentRating:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items: {}
+        version:
+          minimum: 1
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        lastVolume: lastVolume
+        year: 0
+        description:
+          key: description
+        title:
+          key: title
+        originalLanguage: originalLanguage
+        lastChapter: lastChapter
+        version: 1
+        tags:
+        - ""
+        - ""
+        altTitles:
+        - ""
+        - ""
+        publicationDemographic: publicationDemographic
+        createdAt: createdAt
+        isLocked: true
+        links:
+        - ""
+        - ""
+        contentRating: contentRating
+        status: status
+        updatedAt: updatedAt
+    MangaCreate:
+      allOf:
+      - $ref: '#/components/schemas/MangaRequest'
+      - required:
+        - title
+    MangaEdit:
+      allOf:
+      - $ref: '#/components/schemas/MangaRequest'
+      - required:
+        - version
+    ChapterEdit:
+      allOf:
+      - $ref: '#/components/schemas/ChapterRequest'
+      - required:
+        - version
+    Response:
+      title: Response
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+          - error
+      example:
+        result: ok
+    Login:
+      title: Login
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          maxLength: 64
+          minLength: 1
+          type: string
+        password:
+          maxLength: 1024
+          minLength: 8
+          type: string
+      additionalProperties: false
+    LoginResponse:
+      title: LoginResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+          - ko
+        token:
+          $ref: '#/components/schemas/LoginResponse_token'
+      example:
+        result: ok
+        token:
+          session: session
+          refresh: refresh
+    CheckResponse:
+      title: CheckResponse
+      type: object
+      properties:
+        ok:
+          type: string
+          enum:
+          - ok
+          - ko
+        isAuthenticated:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+        permissions:
+          type: array
+          items:
+            type: string
+      example:
+        permissions:
+        - permissions
+        - permissions
+        roles:
+        - roles
+        - roles
+        isAuthenticated: true
+        ok: ok
+    LogoutResponse:
+      title: LogoutResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+          - error
+      example:
+        result: ok
+    RefreshToken:
+      title: RefreshToken
+      required:
+      - token
+      type: object
+      properties:
+        token:
+          minLength: 1
+          type: string
+      additionalProperties: false
+    RefreshResponse:
+      title: RefreshResponse
+      required:
+      - result
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+          - error
+        token:
+          $ref: '#/components/schemas/LoginResponse_token'
+        message:
+          type: string
+      example:
+        result: ok
+        message: message
+        token:
+          session: session
+          refresh: refresh
+    AccountActivateResponse:
+      title: AccountActivateResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+      example:
+        result: ok
+    CreateAccount:
+      title: CreateAccount
+      required:
+      - email
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          maxLength: 64
+          minLength: 1
+          type: string
+        password:
+          maxLength: 1024
+          minLength: 8
+          type: string
+        email:
+          type: string
+          format: email
+    ScanlationGroupResponse:
+      title: ScanlationGroupResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+        data:
+          $ref: '#/components/schemas/ScanlationGroup'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScanlationGroupResponse_relationships'
+      example:
+        result: ok
+        relationships:
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        data:
+          attributes:
+            leader:
+              attributes:
+                version: 1
+                username: username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: user
+            createdAt: createdAt
+            name: name
+            version: 1
+            updatedAt: updatedAt
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: scanlation_group
+    ScanlationGroup:
+      title: ScanlationGroup
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - scanlation_group
+        attributes:
+          $ref: '#/components/schemas/ScanlationGroupAttributes'
+      example:
+        attributes:
+          leader:
+            attributes:
+              version: 1
+              username: username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: user
+          createdAt: createdAt
+          name: name
+          version: 1
+          updatedAt: updatedAt
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: scanlation_group
+    ScanlationGroupAttributes:
+      title: ScanlationGroupAttributes
+      type: object
+      properties:
+        name:
+          type: string
+        leader:
+          $ref: '#/components/schemas/User'
+        version:
+          minimum: 1
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        leader:
+          attributes:
+            version: 1
+            username: username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: user
+        createdAt: createdAt
+        name: name
+        version: 1
+        updatedAt: updatedAt
+    User:
+      title: User
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - user
+        attributes:
+          $ref: '#/components/schemas/UserAttributes'
+      example:
+        attributes:
+          version: 1
+          username: username
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: user
+    UserAttributes:
+      title: UserAttributes
+      type: object
+      properties:
+        username:
+          type: string
+        version:
+          minimum: 1
+          type: integer
+      example:
+        version: 1
+        username: username
+    CreateScanlationGroup:
+      title: CreateScanlationGroup
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        leader:
+          type: string
+          format: uuid
+        members:
+          type: array
+          items:
+            type: string
+            format: uuid
+        version:
+          type: integer
+    ScanlationGroupEdit:
+      title: ScanlationGroupEdit
+      required:
+      - version
+      type: object
+      properties:
+        name:
+          type: string
+        leader:
+          type: string
+          format: uuid
+        members:
+          type: array
+          items:
+            type: string
+            format: uuid
+        version:
+          minimum: 1
+          type: integer
+    CustomListCreate:
+      title: CustomListCreate
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        visibility:
+          type: string
+          enum:
+          - public
+          - private
+        manga:
+          type: array
+          items:
+            type: string
+            format: uuid
+        version:
+          type: integer
+    CustomListEdit:
+      title: CustomListEdit
+      required:
+      - version
+      type: object
+      properties:
+        name:
+          type: string
+        visibility:
+          type: string
+          enum:
+          - public
+          - private
+        manga:
+          type: array
+          items:
+            type: string
+            format: uuid
+        version:
+          minimum: 1
+          type: integer
+    CustomListResponse:
+      title: CustomListResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+          - error
+        data:
+          $ref: '#/components/schemas/CustomList'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+      example:
+        result: ok
+        relationships:
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        data:
+          attributes:
+            owner:
+              attributes:
+                version: 1
+                username: username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: user
+            visibility: private
+            name: name
+            version: 1
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: custom_list
+    CustomList:
+      title: CustomList
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - custom_list
+        attributes:
+          $ref: '#/components/schemas/CustomListAttributes'
+      example:
+        attributes:
+          owner:
+            attributes:
+              version: 1
+              username: username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: user
+          visibility: private
+          name: name
+          version: 1
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: custom_list
+    CustomListAttributes:
+      title: CustomListAttributes
+      type: object
+      properties:
+        name:
+          type: string
+        visibility:
+          type: string
+          enum:
+          - private
+          - public
+        owner:
+          $ref: '#/components/schemas/User'
+        version:
+          minimum: 1
+          type: integer
+      example:
+        owner:
+          attributes:
+            version: 1
+            username: username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: user
+        visibility: private
+        name: name
+        version: 1
+    AuthorResponse:
+      title: AuthorResponse
+      type: object
+      properties:
+        result:
+          type: string
+        data:
+          $ref: '#/components/schemas/Author'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+      example:
+        result: result
+        relationships:
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        data:
+          attributes:
+            createdAt: createdAt
+            imageUrl: imageUrl
+            name: name
+            biography:
+              key: biography
+            version: 0
+            updatedAt: updatedAt
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: author
+    Author:
+      title: Author
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - author
+        attributes:
+          $ref: '#/components/schemas/AuthorAttributes'
+      example:
+        attributes:
+          createdAt: createdAt
+          imageUrl: imageUrl
+          name: name
+          biography:
+            key: biography
+          version: 0
+          updatedAt: updatedAt
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: author
+    AuthorAttributes:
+      title: AuthorAttributes
+      type: object
+      properties:
+        name:
+          type: string
+        imageUrl:
+          type: string
+        biography:
+          type: object
+          additionalProperties:
+            type: string
+        version:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      example:
+        createdAt: createdAt
+        imageUrl: imageUrl
+        name: name
+        biography:
+          key: biography
+        version: 0
+        updatedAt: updatedAt
+    AuthorEdit:
+      title: AuthorEdit
+      required:
+      - version
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          minimum: 1
+          type: integer
+    AuthorCreate:
+      title: AuthorCreate
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          minimum: 1
+          type: integer
+      additionalProperties: false
+    MappingIdBody:
+      title: MappingIdBody
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - group
+          - manga
+          - chapter
+          - tag
+        ids:
+          type: array
+          items:
+            type: integer
+      additionalProperties: false
+    MappingIdResponse:
+      title: MappingIdResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+        data:
+          $ref: '#/components/schemas/MappingId'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+      example:
+        result: ok
+        relationships:
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        data:
+          attributes:
+            newId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            legacyId: 0
+            type: manga
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: mapping_id
+    MappingId:
+      title: MappingId
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - mapping_id
+        attributes:
+          $ref: '#/components/schemas/MappingIdAttributes'
+      example:
+        attributes:
+          newId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          legacyId: 0
+          type: manga
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: mapping_id
+    MappingIdAttributes:
+      title: MappingIdAttributes
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - manga
+          - chapter
+          - group
+          - tag
+        legacyId:
+          type: integer
+        newId:
+          type: string
+          format: uuid
+      example:
+        newId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        legacyId: 0
+        type: manga
+    TagResponse:
+      title: TagResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+        data:
+          $ref: '#/components/schemas/Tag'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+      example:
+        result: ok
+        relationships:
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        data:
+          attributes:
+            name:
+              key: name
+            version: 1
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: tag
+    Tag:
+      title: Tag
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - tag
+        attributes:
+          $ref: '#/components/schemas/TagAttributes'
+      example:
+        attributes:
+          name:
+            key: name
+          version: 1
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: tag
+    TagAttributes:
+      title: TagAttributes
+      type: object
+      properties:
+        name:
+          type: object
+          additionalProperties:
+            type: string
+        version:
+          minimum: 1
+          type: integer
+      example:
+        name:
+          key: name
+        version: 1
+    UserResponse:
+      title: UserResponse
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+        data:
+          $ref: '#/components/schemas/User'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+      example:
+        result: ok
+        relationships:
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: type
+        data:
+          attributes:
+            version: 1
+            username: username
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          type: user
+    SendAccountActivationCode:
+      title: SendAccountActivationCode
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      additionalProperties: false
+    RecoverCompleteBody:
+      title: RecoverCompleteBody
+      required:
+      - newPassword
+      type: object
+      properties:
+        newPassword:
+          maxLength: 1024
+          minLength: 8
+          type: string
+      additionalProperties: false
+    UpdateMangaStatus:
+      title: UpdateMangaStatus
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+          nullable: true
+          enum:
+          - reading
+          - on_hold
+          - plan_to_read
+          - dropped
+          - re_reading
+          - completed
+    ChapterRequest:
+      title: ChapterRequest
+      type: object
+      properties:
+        title:
+          maxLength: 255
+          type: string
+        volume:
+          minimum: 0
+          type: integer
+          nullable: true
+        chapter:
+          maxLength: 8
+          type: string
+          nullable: true
+        translatedLanguage:
+          pattern: "^[a-zA-Z\\-]{2,5}$"
+          type: string
+        pages:
+          type: array
+          items:
+            type: string
+        checksums:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: string
+        version:
+          minimum: 1
+          type: integer
+    AuthorList:
+      title: AuthorList
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+      example:
+        total: 5
+        offset: 1
+        limit: 6
+        results:
+        - result: result
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              createdAt: createdAt
+              imageUrl: imageUrl
+              name: name
+              biography:
+                key: biography
+              version: 0
+              updatedAt: updatedAt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: author
+        - result: result
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              createdAt: createdAt
+              imageUrl: imageUrl
+              name: name
+              biography:
+                key: biography
+              version: 0
+              updatedAt: updatedAt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: author
+    ChapterList:
+      title: ChapterList
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChapterResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+      example:
+        total: 5
+        offset: 5
+        limit: 1
+        results:
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              volume: 0
+              chapter: chapter
+              createdAt: createdAt
+              data:
+              - data
+              - data
+              uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              publishAt: publishAt
+              translatedLanguage: translatedLanguage
+              title: title
+              version: 1
+              hash: hash
+              dataSaver:
+              - dataSaver
+              - dataSaver
+              updatedAt: updatedAt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: chapter
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              volume: 0
+              chapter: chapter
+              createdAt: createdAt
+              data:
+              - data
+              - data
+              uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              publishAt: publishAt
+              translatedLanguage: translatedLanguage
+              title: title
+              version: 1
+              hash: hash
+              dataSaver:
+              - dataSaver
+              - dataSaver
+              updatedAt: updatedAt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: chapter
+    ScanlationGroupList:
+      title: ScanlationGroupList
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScanlationGroupResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+      example:
+        total: 5
+        offset: 1
+        limit: 6
+        results:
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              leader:
+                attributes:
+                  version: 1
+                  username: username
+                id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: user
+              createdAt: createdAt
+              name: name
+              version: 1
+              updatedAt: updatedAt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: scanlation_group
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              leader:
+                attributes:
+                  version: 1
+                  username: username
+                id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: user
+              createdAt: createdAt
+              name: name
+              version: 1
+              updatedAt: updatedAt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: scanlation_group
+    MangaList:
+      title: MangaList
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MangaResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+      example:
+        total: 5
+        offset: 5
+        limit: 1
+        results:
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              lastVolume: lastVolume
+              year: 0
+              description:
+                key: description
+              title:
+                key: title
+              originalLanguage: originalLanguage
+              lastChapter: lastChapter
+              version: 1
+              tags:
+              - ""
+              - ""
+              altTitles:
+              - ""
+              - ""
+              publicationDemographic: publicationDemographic
+              createdAt: createdAt
+              isLocked: true
+              links:
+              - ""
+              - ""
+              contentRating: contentRating
+              status: status
+              updatedAt: updatedAt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: manga
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              lastVolume: lastVolume
+              year: 0
+              description:
+                key: description
+              title:
+                key: title
+              originalLanguage: originalLanguage
+              lastChapter: lastChapter
+              version: 1
+              tags:
+              - ""
+              - ""
+              altTitles:
+              - ""
+              - ""
+              publicationDemographic: publicationDemographic
+              createdAt: createdAt
+              isLocked: true
+              links:
+              - ""
+              - ""
+              contentRating: contentRating
+              status: status
+              updatedAt: updatedAt
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: manga
+    CustomListList:
+      title: CustomListList
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomListResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+      example:
+        total: 1
+        offset: 6
+        limit: 0
+        results:
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              owner:
+                attributes:
+                  version: 1
+                  username: username
+                id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: user
+              visibility: private
+              name: name
+              version: 1
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: custom_list
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              owner:
+                attributes:
+                  version: 1
+                  username: username
+                id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: user
+              visibility: private
+              name: name
+              version: 1
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: custom_list
+    UserList:
+      title: UserList
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+      example:
+        total: 1
+        offset: 6
+        limit: 0
+        results:
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              version: 1
+              username: username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: user
+        - result: ok
+          relationships:
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          data:
+            attributes:
+              version: 1
+              username: username
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: user
+    order:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          enum:
+          - asc
+          - desc
+        updatedAt:
+          type: string
+          enum:
+          - asc
+          - desc
+    order_1:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          enum:
+          - asc
+          - desc
+        updatedAt:
+          type: string
+          enum:
+          - asc
+          - desc
+        publishAt:
+          type: string
+          enum:
+          - asc
+          - desc
+    inline_response_200:
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+        data:
+          type: array
+          items:
+            type: string
+            format: uuid
+      example:
+        result: ok
+        data:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+    inline_response_200_1:
+      type: object
+      properties:
+        result:
+          type: string
+          enum:
+          - ok
+          - ko
+      example:
+        result: ok
+    inline_response_200_2:
+      type: object
+      properties:
+        baseUrl:
+          type: string
+          description: MD@Home server URL
+      example:
+        baseUrl: baseUrl
+    inline_response_200_3:
+      type: object
+      properties:
+        result:
+          type: string
+          default: ok
+        statuses:
+          type: object
+          additionalProperties:
+            type: string
+            enum:
+            - reading
+            - on_hold
+            - plan_to_read
+            - dropped
+            - re_reading
+            - completed
+      example:
+        result: ok
+        statuses:
+          b019ea5d-5fe6-44d4-abbc-f546f210884d: reading
+          "2394a5c7-1d2e-461f-acde-18726b9e37d6": dropped
+    body:
+      required:
+      - captchaChallenge
+      type: object
+      properties:
+        captchaChallenge:
+          minLength: 1
+          type: string
+    LoginResponse_token:
+      type: object
+      properties:
+        session:
+          type: string
+        refresh:
+          type: string
+      example:
+        session: session
+        refresh: refresh
+    ScanlationGroupResponse_relationships:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+      example:
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: type
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
