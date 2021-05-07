@@ -1111,7 +1111,9 @@ func (a *MangaApiService) GetSearchManga(ctx context.Context, localVarOptionals 
 		localVarQueryParams.Add("ids", parameterToString(localVarOptionals.Ids.Value(), "multi"))
 	}
 	if localVarOptionals != nil && localVarOptionals.ContentRating.IsSet() {
-		localVarQueryParams.Add("contentRating", parameterToString(localVarOptionals.ContentRating.Value(), "multi"))
+		// todo: future self, can we make arrays be smarter?
+		// todo: had to convert this to properly set the array value...
+		localVarQueryParams.Add("contentRating[]", parameterToString(localVarOptionals.ContentRating.Value(), "multi"))
 	}
 	if localVarOptionals != nil && localVarOptionals.CreatedAtSince.IsSet() {
 		localVarQueryParams.Add("createdAtSince", parameterToString(localVarOptionals.CreatedAtSince.Value(), ""))
