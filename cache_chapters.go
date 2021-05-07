@@ -18,6 +18,7 @@ import (
 func reportToMangadexNetwork(url string, filename string, start time.Time, success bool, cached bool) {
 
 	// Create default
+	urlMdAtHome := "https://api.mangadex.network/report"
 	values := make(map[string]interface{})
 	values["url"] = url
 	values["success"] = success
@@ -28,7 +29,7 @@ func reportToMangadexNetwork(url string, filename string, start time.Time, succe
 	// If failed directly report
 	if !success {
 		jsonValue, _ := json.Marshal(values)
-		resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+		resp, err := http.Post(urlMdAtHome, "application/json", bytes.NewBuffer(jsonValue))
 		if err != nil {
 			fmt.Printf("MD@HOME: %v", err)
 		} else {
@@ -41,7 +42,7 @@ func reportToMangadexNetwork(url string, filename string, start time.Time, succe
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		values["success"] = false
 		jsonValue, _ := json.Marshal(values)
-		resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+		resp, err := http.Post(urlMdAtHome, "application/json", bytes.NewBuffer(jsonValue))
 		if err != nil {
 			fmt.Printf("MD@HOME: %v", err)
 		} else {
@@ -55,7 +56,7 @@ func reportToMangadexNetwork(url string, filename string, start time.Time, succe
 	values["bytes"] = fi.Size()
 	jsonValue, _ := json.Marshal(values)
 	//fmt.Println(string(jsonValue))
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+	resp, err := http.Post(urlMdAtHome, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Printf("MD@HOME: %v", err)
 	} else {
@@ -64,13 +65,12 @@ func reportToMangadexNetwork(url string, filename string, start time.Time, succe
 
 }
 
-func downloadChapterImage(chapterPath string, chapter mangadex.Chapter, image string, baseUrl string) {
+func downloadChapterImage(chapterPath string, chapter mangadex.ChapterResponse, image string, baseUrl string) {
 
 	// Create the url we will download
 	start := time.Now()
 	filename := chapterPath + image
-	url := baseUrl + "/data/" + chapter.Attributes.Hash + "/" + image
-	//fmt.Printf("%d/%d (image %d/%d) -> %s\n", i, totalChapters, c+1, len(chapter.Attributes.Data), url)
+	url := baseUrl + "/data/" + chapter.Data.Attributes.Hash + "/" + image
 
 	// Skip if already downloaded
 	if _, err := os.Stat(filename); err == nil {
@@ -112,6 +112,14 @@ func main() {
 	// Directory configuration
 	dirChapters := "data/chapter/"
 	dirImages := "data/images/"
+	err := os.MkdirAll(dirChapters, os.ModePerm)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+	err = os.MkdirAll(dirImages, os.ModePerm)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
 
 	// Create client
 	config := mangadex.NewConfiguration()
@@ -132,18 +140,26 @@ func main() {
 		}
 
 		// Load the json from file into our chapter struct
-		chapter := mangadex.Chapter{}
+		chapter := mangadex.ChapterResponse{}
 		fileManga, _ := ioutil.ReadFile(dirChapters + file.Name())
 		_ = json.Unmarshal([]byte(fileManga), &chapter)
 
 		// Skip if not in english
-		if chapter.Attributes.TranslatedLanguage != "en" {
+		if chapter.Data.Attributes.TranslatedLanguage != "en" {
 			continue
 		}
 
+		// Find the manga id
+		mangaId := "unknown"
+		for _, relation := range chapter.Relationships {
+			if relation.Type_ == "manga" {
+				mangaId = relation.Id
+			}
+		}
+
 		// Create our save folder path
-		fmt.Printf("chapter %s\n", chapter.Id)
-		chapterPath := dirImages + chapter.Id + "/"
+		fmt.Printf("chapter %s of manga %s\n", chapter.Data.Id, mangaId)
+		chapterPath := dirImages + chapter.Data.Id + "/"
 		err := os.MkdirAll(chapterPath, os.ModePerm)
 		if err != nil {
 			log.Fatalf("%v", err)
@@ -151,7 +167,7 @@ func main() {
 
 		// Get the mangadex@home url we will download the images from
 		opts := mangadex.AtHomeApiGetAtHomeServerChapterIdOpts{}
-		mdexAtHome, resp, err := client.AtHomeApi.GetAtHomeServerChapterId(ctx, chapter.Id, &opts)
+		mdexAtHome, resp, err := client.AtHomeApi.GetAtHomeServerChapterId(ctx, chapter.Data.Id, &opts)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
@@ -163,7 +179,7 @@ func main() {
 		// Create our worker pool which will try to download many chapters
 		start := time.Now()
 		var wg sync.WaitGroup
-		workerPoolSize := 10
+		workerPoolSize := 20
 		dataCh := make(chan string, workerPoolSize)
 		for w := 0; w < workerPoolSize; w++ {
 			wg.Add(1)
@@ -177,7 +193,7 @@ func main() {
 		}
 
 		// Now feed data into our channel till it is done
-		for _, image := range chapter.Attributes.Data {
+		for _, image := range chapter.Data.Attributes.Data {
 			dataCh <- image
 		}
 		close(dataCh)

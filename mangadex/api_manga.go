@@ -12,12 +12,12 @@ package mangadex
 
 import (
 	"context"
+	"fmt"
+	"github.com/antihax/optional"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
-	"fmt"
-	"github.com/antihax/optional"
 )
 
 // Linger please
@@ -1081,7 +1081,13 @@ func (a *MangaApiService) GetSearchManga(ctx context.Context, localVarOptionals 
 		localVarQueryParams.Add("year", parameterToString(localVarOptionals.Year.Value(), ""))
 	}
 	if localVarOptionals != nil && localVarOptionals.IncludedTags.IsSet() {
-		localVarQueryParams.Add("includedTags", parameterToString(localVarOptionals.IncludedTags.Value(), "multi"))
+		// todo: future self, can we make arrays be smarter?
+		// todo: had to convert this to properly set the array value...
+		tags := localVarOptionals.IncludedTags.Value().([]string)
+		for _, tag := range tags {
+			localVarQueryParams.Add("includedTags[]", parameterToString(tag, ""))
+		}
+		//localVarQueryParams.Add("includedTags", parameterToString(localVarOptionals.IncludedTags.Value(), "multi"))
 	}
 	if localVarOptionals != nil && localVarOptionals.IncludedTagsMode.IsSet() {
 		localVarQueryParams.Add("includedTagsMode", parameterToString(localVarOptionals.IncludedTagsMode.Value(), ""))
