@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func downloadMangas(dirMangas string, ctx context.Context, client *mangadex.APIClient,
+func downloadMangasBySearching(dirMangas string, ctx context.Context, client *mangadex.APIClient,
 	tagId2Tag *map[string]mangadex.TagResponse,
 	mangasDownloaded *map[string]bool, tags []string, rating string) {
 
@@ -44,19 +44,24 @@ func downloadMangas(dirMangas string, ctx context.Context, client *mangadex.APIC
 		}
 		// robustly re-try a few times if we fail
 		mangaList := mangadex.MangaList{}
-		err := errors.New("startup")
 		resp := &http.Response{}
-		for retryCount := 0; retryCount < 3 && err != nil; retryCount++ {
+		err := errors.New("startup")
+		for retryCount := 0; retryCount <= 3 && err != nil; retryCount++ {
 			mangaList, resp, err = client.MangaApi.GetSearchManga(ctx, &opts)
 			if err != nil {
 				fmt.Printf("\u001B[1;31mMANGA ERROR: %v\u001B[0m\n", err)
-				time.Sleep(250 * time.Millisecond)
-			}
-			if resp.StatusCode != 200 && resp.StatusCode != 204 {
+			} else if resp == nil {
+				err = errors.New("invalid response object")
+				fmt.Printf("\u001B[1;31mMANGA ERROR: respose object is nil\u001B[0m\n")
+				continue
+			} else if resp.StatusCode != 200 && resp.StatusCode != 204 {
 				err = errors.New("invalid http error code")
 				fmt.Printf("\u001B[1;31mMANGA ERROR: http code %d\u001B[0m\n", resp.StatusCode)
-				time.Sleep(250 * time.Millisecond)
 			}
+			if err == nil {
+				resp.Body.Close()
+			}
+			time.Sleep(250 * time.Millisecond)
 		}
 
 		// Debug print total for this tag
@@ -168,12 +173,12 @@ func main() {
 	start := time.Now()
 	mangasDownloaded := make(map[string]bool)
 	for _, rating := range contentRatingIdList {
-		downloadMangas(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating)
+		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating)
 	}
 	for _, tags := range tagIdListCombinations {
-		downloadMangas(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "")
+		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "")
 	}
-	fmt.Printf("downloaded %d mangas in %s!!\n", len(mangasDownloaded), time.Since(start))
+	fmt.Printf("downloaded %d mangas in %s!!\n\n", len(mangasDownloaded), time.Since(start))
 
 	// Loop through all manga and try to get their chapter information for each
 	itemsManga, _ := ioutil.ReadDir(dirMangas)
@@ -196,20 +201,22 @@ func main() {
 		// robustly re-try a few times if we fail
 		chapterList := mangadex.ChapterList{}
 		err := errors.New("startup")
-		for retryCount := 0; retryCount < 3 && err != nil; retryCount++ {
+		for retryCount := 0; retryCount <= 3 && err != nil; retryCount++ {
 			chapterList, resp, err = client.MangaApi.GetMangaIdFeed(ctx, manga.Data.Id, &opts)
-			if resp != nil && resp.StatusCode == 404 {
-				break
-			}
 			if err != nil {
 				fmt.Printf("\u001B[1;31mCHAPTER ERROR: %v\u001B[0m\n", err)
-				time.Sleep(250 * time.Millisecond)
-			}
-			if resp.StatusCode != 200 && resp.StatusCode != 204 {
+			} else if resp == nil {
+				err = errors.New("invalid response object")
+				fmt.Printf("\u001B[1;31mCHAPTER ERROR: respose object is nil\u001B[0m\n")
+				continue
+			} else if resp.StatusCode != 200 && resp.StatusCode != 204 && resp.StatusCode != 404 {
 				err = errors.New("invalid http error code")
 				fmt.Printf("\u001B[1;31mCHAPTER ERROR: http code %d\u001B[0m\n", resp.StatusCode)
-				time.Sleep(250 * time.Millisecond)
 			}
+			if err == nil {
+				resp.Body.Close()
+			}
+			time.Sleep(250 * time.Millisecond)
 		}
 
 		// Loop through all chapter for this manga and save to disk
@@ -220,7 +227,6 @@ func main() {
 			_ = ioutil.WriteFile(dirChapters+chapter.Data.Id+".json", fileChapter, 0644)
 		}
 		fmt.Println()
-		time.Sleep(250 * time.Millisecond)
 
 	}
 

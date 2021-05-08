@@ -5,12 +5,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -32,9 +34,9 @@ func reportToMangadexNetwork(url string, filename string, start time.Time, succe
 		resp, err := http.Post(urlMdAtHome, "application/json", bytes.NewBuffer(jsonValue))
 		if err != nil {
 			fmt.Printf("MD@HOME: %v", err)
-		} else {
-			resp.Body.Close()
+			return
 		}
+		resp.Body.Close()
 		return
 	}
 
@@ -45,9 +47,9 @@ func reportToMangadexNetwork(url string, filename string, start time.Time, succe
 		resp, err := http.Post(urlMdAtHome, "application/json", bytes.NewBuffer(jsonValue))
 		if err != nil {
 			fmt.Printf("MD@HOME: %v", err)
-		} else {
-			resp.Body.Close()
+			return
 		}
+		resp.Body.Close()
 		return
 	}
 
@@ -59,13 +61,13 @@ func reportToMangadexNetwork(url string, filename string, start time.Time, succe
 	resp, err := http.Post(urlMdAtHome, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Printf("MD@HOME: %v", err)
-	} else {
-		resp.Body.Close()
+		return
 	}
+	resp.Body.Close()
 
 }
 
-func downloadChapterImage(chapterPath string, chapter mangadex.ChapterResponse, image string, baseUrl string) {
+func downloadChapterImage(chapterPath string, chapter mangadex.ChapterResponse, image string, baseUrl string) bool {
 
 	// Create the url we will download
 	start := time.Now()
@@ -74,7 +76,12 @@ func downloadChapterImage(chapterPath string, chapter mangadex.ChapterResponse, 
 
 	// Skip if already downloaded
 	if _, err := os.Stat(filename); err == nil {
-		return
+		return true
+	}
+
+	// Skip if a manga plus chapter
+	if strings.Contains(image, "mangaplus") {
+		return true
 	}
 
 	// Try to download
@@ -82,28 +89,32 @@ func downloadChapterImage(chapterPath string, chapter mangadex.ChapterResponse, 
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		reportToMangadexNetwork(url, filename, start, false, false)
-		return
+		return false
 	}
 	cacheHit := imgResp.Header.Get("X-Cache")
 
 	// Open a file for writing and write the response!
 	file, err := os.Create(filename)
 	if err != nil {
+		imgResp.Body.Close()
 		fmt.Printf("%v\n", err)
 		reportToMangadexNetwork(url, filename, start, false, cacheHit == "HIT")
-		return
+		return false
 	}
 	_, err = io.Copy(file, imgResp.Body)
 	if err != nil {
+		file.Close()
+		imgResp.Body.Close()
 		fmt.Printf("%v\n", err)
 		reportToMangadexNetwork(url, filename, start, false, cacheHit == "HIT")
-		return
+		return false
 	}
-	imgResp.Body.Close()
-	file.Close()
 
 	// Report to mangadex @ home network!
 	reportToMangadexNetwork(url, filename, start, true, cacheHit == "HIT")
+	file.Close()
+	imgResp.Body.Close()
+	return true
 
 }
 
@@ -142,7 +153,7 @@ func main() {
 		// Load the json from file into our chapter struct
 		chapter := mangadex.ChapterResponse{}
 		fileManga, _ := ioutil.ReadFile(dirChapters + file.Name())
-		_ = json.Unmarshal([]byte(fileManga), &chapter)
+		_ = json.Unmarshal(fileManga, &chapter)
 
 		// Skip if not in english
 		if chapter.Data.Attributes.TranslatedLanguage != "en" {
@@ -162,17 +173,38 @@ func main() {
 		chapterPath := dirImages + chapter.Data.Id + "/"
 		err := os.MkdirAll(chapterPath, os.ModePerm)
 		if err != nil {
-			log.Fatalf("%v", err)
+			fmt.Printf("\u001B[1;31mERROR: unable to create path %s\u001B[0m\n", chapterPath)
+			fmt.Printf("\u001B[1;31mERROR: %v\u001B[0m\n", err)
+			continue
 		}
 
 		// Get the mangadex@home url we will download the images from
+		// robustly re-try a few times if we fail
 		opts := mangadex.AtHomeApiGetAtHomeServerChapterIdOpts{}
-		mdexAtHome, resp, err := client.AtHomeApi.GetAtHomeServerChapterId(ctx, chapter.Data.Id, &opts)
-		if err != nil {
-			log.Fatalf("%v", err)
+		mdexAtHome := mangadex.InlineResponse2002{}
+		resp := &http.Response{}
+		err = errors.New("startup")
+		for retryCount := 0; retryCount <= 5 && err != nil; retryCount++ {
+			mdexAtHome, resp, err = client.AtHomeApi.GetAtHomeServerChapterId(ctx, chapter.Data.Id, &opts)
+			if err != nil {
+				fmt.Printf("\u001B[1;31mERROR: %v\u001B[0m\n", err)
+			} else if resp == nil {
+				err = errors.New("invalid response object")
+				fmt.Printf("\u001B[1;31mERROR: respose object is nil\u001B[0m\n")
+				continue
+			} else if resp.StatusCode != 200 {
+				err = errors.New("invalid http error code")
+				fmt.Printf("\u001B[1;31mERROR: http code %d\u001B[0m\n", resp.StatusCode)
+			}
+			if err == nil {
+				resp.Body.Close()
+			}
+			time.Sleep(250 * time.Millisecond)
 		}
-		if resp.StatusCode != 200 {
-			fmt.Printf("HTTP ERROR CODE %d\n", resp.StatusCode)
+		if err != nil || mdexAtHome.BaseUrl == "" {
+			fmt.Printf("\u001B[1;31mERROR: unable to resolve md@home endpoint...\u001B[0m\n")
+			fmt.Printf("\u001B[1;31mERROR: will skip this chapter and retry the next in a second!\u001B[0m\n")
+			time.Sleep(1 * time.Second)
 			continue
 		}
 
@@ -186,8 +218,17 @@ func main() {
 			go func() {
 				defer wg.Done()
 				for data := range dataCh {
-					downloadChapterImage(chapterPath, chapter, data, mdexAtHome.BaseUrl)
-					fmt.Printf("\t- downloaded %s\n", data)
+					// robustly re-try to download a few times
+					success := false
+					for retryCount := 0; retryCount <= 3 && !success; retryCount++ {
+						success = downloadChapterImage(chapterPath, chapter, data, mdexAtHome.BaseUrl)
+						if success {
+							fmt.Printf("\t- downloaded %s\n", data)
+						} else {
+							fmt.Printf("\u001B[1;31m\t- failed %s\n (retry %d)\u001B[0m", data, retryCount)
+							time.Sleep(100 * time.Millisecond)
+						}
+					}
 				}
 			}()
 		}
