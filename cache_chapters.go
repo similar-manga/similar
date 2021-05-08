@@ -225,7 +225,7 @@ func main() {
 						if success {
 							fmt.Printf("\t- downloaded %s\n", data)
 						} else {
-							fmt.Printf("\u001B[1;31m\t- failed %s\n (retry %d)\u001B[0m", data, retryCount)
+							fmt.Printf("\u001B[1;31m\t- failed %s (retry %d)\n\u001B[0m", data, retryCount)
 							time.Sleep(100 * time.Millisecond)
 						}
 					}
