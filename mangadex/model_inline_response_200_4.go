@@ -9,8 +9,7 @@
  */
 package mangadex
 
-type ScanlationGroupResponse struct {
-	Result        string                                 `json:"result,omitempty"`
-	Data          *ScanlationGroup                       `json:"data,omitempty"`
-	Relationships []ScanlationGroupResponseRelationships `json:"relationships,omitempty"`
+type InlineResponse2004 struct {
+	Result string `json:"result,omitempty"`
+	Status string `json:"status,omitempty"`
 }
