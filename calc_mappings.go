@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 )
 
 func openCSVFileStream(path string) *os.File {
@@ -93,12 +94,13 @@ func main() {
 	defer writerAlternativeImage.Flush()
 
 	// Loop through all manga and try to get their chapter information for each
+	start := time.Now()
 	countHaveImagesExternal := make(map[string]int)
 	countHaveImages := 0
 	itemsManga, _ := ioutil.ReadDir(dirMangas)
 	itemsMangaPrivate, _ := ioutil.ReadDir(dirMangasPrivate)
 	itemsManga = append(itemsManga, itemsMangaPrivate...)
-	for i, file := range itemsManga {
+	for ct, file := range itemsManga {
 
 		// Skip if a directory
 		if file.IsDir() {
@@ -142,13 +144,13 @@ func main() {
 
 		// Get our url for this manga if we can
 		url := ""
-		if _, ok := manga.Data.Attributes.Links["al"]; ok {
-			url = external.GetCoverAniList(manga.Data.Attributes.Links["al"])
-			countHaveImagesExternal["al"]++
-		}
-		if _, ok := manga.Data.Attributes.Links["kt"]; url == "" && ok {
+		if _, ok := manga.Data.Attributes.Links["kt"]; ok {
 			url = external.GetCoverKitsu(manga.Data.Attributes.Links["kt"])
 			countHaveImagesExternal["kt"]++
+		}
+		if _, ok := manga.Data.Attributes.Links["al"]; url == "" && ok {
+			url = external.GetCoverAniList(manga.Data.Attributes.Links["al"])
+			countHaveImagesExternal["al"]++
 		}
 		if _, ok := manga.Data.Attributes.Links["mal"]; url == "" && ok {
 			url = external.GetCoverMyAnimeList(manga.Data.Attributes.Links["mal"])
@@ -169,11 +171,10 @@ func main() {
 		}
 
 		// Debug
-		if i%200 == 0 {
-			fmt.Printf("%d/%d mangas loaded (%d have images)....\n", i+1, len(itemsManga), countHaveImages)
-		}
-		if i > 1000 {
-			break
+		if ct%100 == 0 {
+			avgIterTime := float64(ct+1)/(1e-9*float64(time.Since(start).Nanoseconds()))
+			fmt.Printf("%d/%d mangas loaded at %.2f manga/sec (%d have images)....\n",
+				ct, len(itemsManga), avgIterTime, countHaveImages)
 		}
 
 	}
