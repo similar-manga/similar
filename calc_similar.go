@@ -63,6 +63,9 @@ func main() {
 		if _, ok := manga.Data.Attributes.Links["mu"]; url == "" && ok {
 			url = external.GetCoverMangaUpdates(manga.Data.Attributes.Links["mu"])
 		}
+		if _, ok := manga.Data.Attributes.Links["ap"]; url == "" && ok {
+			url = external.GetCoverAnimePlanet(manga.Data.Attributes.Links["ap"])
+		}
 
 		// Append to the corpus
 		corpus = append(corpus, manga.Data.Attributes.Description["en"])
@@ -73,11 +76,11 @@ func main() {
 		}
 
 		// Debug
-		if len(mangas) > 2000 {
-			break
-		}
 		if len(mangas)%200 == 0 {
 			fmt.Printf("%d/%d mangas loaded (%d have images)....\n", len(mangas), len(itemsManga), countHaveImages)
+		}
+		if len(mangas) > 300 {
+			break
 		}
 
 	}

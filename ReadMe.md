@@ -12,6 +12,7 @@ If you want to use it, please download [Neko](https://github.com/CarlosEsco/Neko
 
 Client was generated using [swagger](https://editor.swagger.io/).
 You will need to setup a [golang workspace](https://golang.org/doc/install), and then run the following commands.
+Only manga need to be downloaded / scraped from mangadex to be able to perform similar manga identification.
 
 ```
 go get golang.org/x/oauth2

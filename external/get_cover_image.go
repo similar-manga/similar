@@ -119,3 +119,29 @@ func GetCoverMangaUpdates(id string) string {
 		"> div > div > center > img").AttrOr("src", "")
 
 }
+
+func GetCoverAnimePlanet(id string) string {
+
+	// Query and get our html... (no api...)
+	url := "https://www.anime-planet.com/manga/" + id
+	resp, err := http.Get(url)
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return ""
+	}
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		return ""
+	}
+
+	// Return the url of the image
+	// Logic found using google chrome (right click in inspector and copy "selector")
+	return "https://www.anime-planet.com" +
+		doc.Find("#entry > div > div > div > div > img").AttrOr("src", "")
+
+}
