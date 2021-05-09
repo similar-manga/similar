@@ -28,7 +28,7 @@ func checkLoginStatus(client *mangadex.APIClient, ctx context.Context) mangadex.
 func main() {
 
 	// Directory configuration
-	fileSession := "data/session.json"
+	fileSession := "session.json"
 	userUsername := flag.String("username", "", "mangadex username")
 	userPassword := flag.String("password", "", "mangadex password")
 	flag.Parse()
