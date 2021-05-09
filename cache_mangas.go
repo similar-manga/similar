@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func downloadMangasBySearching(dirMangas string, dirMangasPrivate string, ctx context.Context, client *mangadex.APIClient,
+func downloadMangasBySearching(dirMangas string, ctx context.Context, client *mangadex.APIClient,
 	tagId2Tag *map[string]mangadex.TagResponse,
 	mangasDownloaded *map[string]bool, tags []string, rating string) {
 
@@ -84,14 +84,7 @@ func downloadMangasBySearching(dirMangas string, dirMangasPrivate string, ctx co
 			//fmt.Printf("%d/%d -> %s\n", currentOffset+int32(i), maxOffset, manga.Data.Id)
 			if !(*mangasDownloaded)[manga.Data.Id] {
 				file, _ := json.MarshalIndent(manga, "", " ")
-				filePath := manga.Data.Id + ".json"
-				if manga.Data.Attributes.ContentRating == "pornographic" ||
-					manga.Data.Attributes.ContentRating == "erotica" {
-					filePath = dirMangasPrivate + filePath
-				} else {
-					filePath = dirMangas + filePath
-				}
-				_ = ioutil.WriteFile(filePath, file, 0644)
+				_ = ioutil.WriteFile(dirMangas + manga.Data.Id + ".json", file, 0644)
 				(*mangasDownloaded)[manga.Data.Id] = true
 			}
 		}
@@ -112,14 +105,9 @@ func main() {
 
 	// Directory configuration
 	dirMangas := "../data/manga/"
-	dirMangasPrivate := "../data/manga_private/"
 	dirChapters := "../data/chapter/"
 	fileTagList := "../data/taglist.json"
 	err := os.MkdirAll(dirMangas, os.ModePerm)
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-	err = os.MkdirAll(dirMangasPrivate, os.ModePerm)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -185,10 +173,10 @@ func main() {
 	start := time.Now()
 	mangasDownloaded := make(map[string]bool)
 	for _, rating := range contentRatingIdList {
-		downloadMangasBySearching(dirMangas, dirMangasPrivate, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating)
+		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating)
 	}
 	for _, tags := range tagIdListCombinations {
-		downloadMangasBySearching(dirMangas, dirMangasPrivate, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "")
+		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "")
 	}
 	fmt.Printf("downloaded %d mangas in %s!!\n\n", len(mangasDownloaded), time.Since(start))
 
