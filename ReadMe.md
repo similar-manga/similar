@@ -8,16 +8,17 @@ If you want to use it, please download [Neko](https://github.com/CarlosEsco/Neko
 
 
 
-## Setup / Deps
+## Setup / Dependencies
 
 Client was generated using [swagger](https://editor.swagger.io/).
-You will need to setup a golang workspace, and then run the following commands.
+You will need to setup a [golang workspace](https://golang.org/doc/install), and then run the following commands.
 
 ```
 go get golang.org/x/oauth2
 go get github.com/antihax/optional
 go get github.com/james-bowman/nlp
 ```
+
 
 ## Manga Links Data
 

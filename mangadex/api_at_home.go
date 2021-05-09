@@ -12,12 +12,12 @@ package mangadex
 
 import (
 	"context"
+	"fmt"
+	"github.com/antihax/optional"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
-	"fmt"
-	"github.com/antihax/optional"
 )
 
 // Linger please
@@ -36,7 +36,7 @@ AtHomeApiService Get MD@Home node URL
 */
 
 type AtHomeApiGetAtHomeServerChapterIdOpts struct {
-    Ssl optional.Bool
+	ForcePort443 optional.Bool
 }
 
 func (a *AtHomeApiService) GetAtHomeServerChapterId(ctx context.Context, chapterId string, localVarOptionals *AtHomeApiGetAtHomeServerChapterIdOpts) (InlineResponse2002, *http.Response, error) {
@@ -56,8 +56,8 @@ func (a *AtHomeApiService) GetAtHomeServerChapterId(ctx context.Context, chapter
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
-	if localVarOptionals != nil && localVarOptionals.Ssl.IsSet() {
-		localVarQueryParams.Add("ssl", parameterToString(localVarOptionals.Ssl.Value(), ""))
+	if localVarOptionals != nil && localVarOptionals.ForcePort443.IsSet() {
+		localVarQueryParams.Add("forcePort443", parameterToString(localVarOptionals.ForcePort443.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{}

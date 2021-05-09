@@ -180,6 +180,14 @@ func main() {
 			continue
 		}
 
+		// Skip if already downloaded images for this
+		itemsImages, _ := ioutil.ReadDir(chapterPath)
+		if len(itemsImages) == len(chapter.Data.Attributes.Data) {
+			fmt.Printf("\tskipping since we have all image!\n")
+			continue
+		}
+
+
 		// Get the mangadex@home url we will download the images from
 		// robustly re-try a few times if we fail
 		opts := mangadex.AtHomeApiGetAtHomeServerChapterIdOpts{}
@@ -193,7 +201,6 @@ func main() {
 			} else if resp == nil {
 				err = errors.New("invalid response object")
 				fmt.Printf("\u001B[1;31mERROR: respose object is nil\u001B[0m\n")
-				continue
 			} else if resp.StatusCode != 200 {
 				err = errors.New("invalid http error code")
 				fmt.Printf("\u001B[1;31mERROR: http code %d\u001B[0m\n", resp.StatusCode)
@@ -205,8 +212,8 @@ func main() {
 		}
 		if err != nil || mdexAtHome.BaseUrl == "" {
 			fmt.Printf("\u001B[1;31mERROR: unable to resolve md@home endpoint...\u001B[0m\n")
-			fmt.Printf("\u001B[1;31mERROR: will skip this chapter and retry the next in a second!\u001B[0m\n")
-			time.Sleep(1 * time.Second)
+			fmt.Printf("\u001B[1;31mERROR: will skip this chapter and retry the next in a few second!\u001B[0m\n")
+			time.Sleep(2 * time.Second)
 			continue
 		}
 
@@ -242,8 +249,7 @@ func main() {
 		}
 		close(dataCh)
 		wg.Wait()
-		fmt.Println()
-		fmt.Printf("chapter took %s\n", time.Since(start))
+		fmt.Printf("\t- chapter took %s in total\n\n", time.Since(start))
 		time.Sleep(200 * time.Millisecond)
 
 	}
