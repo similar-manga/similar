@@ -209,7 +209,7 @@ func GetCoverAnimePlanet(id string) string {
 	timeSinceLast := time.Since(lastTimeCoverAP)
 	if timeSinceLast.Milliseconds() < minMilliBetween {
 		milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
-		fmt.Printf("\u001B[1;31mEXTERNAL AP: waiting %d milliseconds\u001B[0m\n", milliToWait)
+		//fmt.Printf("\u001B[1;31mEXTERNAL AP: waiting %d milliseconds\u001B[0m\n", milliToWait)
 		time.Sleep(time.Duration(1e6 * milliToWait))
 	}
 

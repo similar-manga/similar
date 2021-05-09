@@ -31,12 +31,17 @@ func main() {
 
 	// Directory configuration
 	dirMangas := "../data/manga/"
-	dirMangasPrivate := "../data/manga_private/"
 	dirMappings := "../data/mapping/"
 	err := os.MkdirAll(dirMappings, os.ModePerm)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
+
+	// id, title, and content rating (for cache searching)
+	fileSEARCH := openCSVFileStream(dirMappings + "mdex2search.csv")
+	defer fileSEARCH.Close()
+	writerSEARCH := csv.NewWriter(fileSEARCH)
+	defer writerSEARCH.Flush()
 
 	// anilist
 	// https://anilist.co/manga/`{id}`
@@ -87,19 +92,9 @@ func main() {
 	writerMAL := csv.NewWriter(fileMAL)
 	defer writerMAL.Flush()
 
-	// Alternative cover urls for use if we are cache'ing
-	fileAlternativeImage := openCSVFileStream(dirMappings + "mdex2altimage.csv")
-	defer fileAlternativeImage.Close()
-	writerAlternativeImage := csv.NewWriter(fileAlternativeImage)
-	defer writerAlternativeImage.Flush()
-
 	// Loop through all manga and try to get their chapter information for each
 	start := time.Now()
-	countHaveImagesExternal := make(map[string]int)
-	countHaveImages := 0
 	itemsManga, _ := ioutil.ReadDir(dirMangas)
-	itemsMangaPrivate, _ := ioutil.ReadDir(dirMangasPrivate)
-	itemsManga = append(itemsManga, itemsMangaPrivate...)
 	for ct, file := range itemsManga {
 
 		// Skip if a directory
@@ -110,7 +105,15 @@ func main() {
 		// Load the json from file into our manga struct
 		manga := mangadex.MangaResponse{}
 		fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
-		_ = json.Unmarshal(fileManga, &manga)
+		err := json.Unmarshal(fileManga, &manga)
+		if err != nil {
+			fmt.Printf("MANGA LOAD ERROR: %v (file %s)\n", err, file.Name())
+			continue
+		}
+
+		// Our search file
+		data := []string{manga.Data.Id, manga.Data.Attributes.Title["en"], manga.Data.Attributes.ContentRating}
+		writeToCSV(writerSEARCH, data)
 
 		// Save the external mappings
 		if _, ok := manga.Data.Attributes.Links["al"]; ok {
@@ -140,6 +143,58 @@ func main() {
 		if _, ok := manga.Data.Attributes.Links["mal"]; ok {
 			data := []string{manga.Data.Attributes.Links["mal"], manga.Data.Id}
 			writeToCSV(writerMAL, data)
+		}
+
+		// Debug
+		if ct%100 == 0 {
+			avgIterTime := float64(ct+1) / (1e-9 * float64(time.Since(start).Nanoseconds()))
+			fmt.Printf("%d/%d mangas loaded at %.2f manga/sec....\n",
+				ct, len(itemsManga), avgIterTime)
+		}
+
+	}
+	fmt.Printf("done processing mappings!\n")
+	writerSEARCH.Flush()
+	writerAL.Flush()
+	writerAP.Flush()
+	writerBW.Flush()
+	writerMU.Flush()
+	writerNU.Flush()
+	writerKT.Flush()
+	writerMAL.Flush()
+	fileSEARCH.Close()
+	fileAL.Close()
+	fileAP.Close()
+	fileBW.Close()
+	fileMU.Close()
+	fileNU.Close()
+	fileKT.Close()
+	fileMAL.Close()
+
+	// Alternative cover urls for use if we are cache'ing
+	fileAlternativeImage := openCSVFileStream(dirMappings + "mdex2altimage.csv")
+	defer fileAlternativeImage.Close()
+	writerAlternativeImage := csv.NewWriter(fileAlternativeImage)
+	defer writerAlternativeImage.Flush()
+
+	// Loop through all manga and try to get their chapter information for each
+	start = time.Now()
+	countHaveImagesExternal := make(map[string]int)
+	countHaveImages := 0
+	for ct, file := range itemsManga {
+
+		// Skip if a directory
+		if file.IsDir() {
+			continue
+		}
+
+		// Load the json from file into our manga struct
+		manga := mangadex.MangaResponse{}
+		fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
+		err := json.Unmarshal(fileManga, &manga)
+		if err != nil {
+			fmt.Printf("MANGA LOAD ERROR: %v (file %s)\n", err, file.Name())
+			continue
 		}
 
 		// Get our url for this manga if we can
@@ -172,7 +227,7 @@ func main() {
 
 		// Debug
 		if ct%100 == 0 {
-			avgIterTime := float64(ct+1)/(1e-9*float64(time.Since(start).Nanoseconds()))
+			avgIterTime := float64(ct+1) / (1e-9 * float64(time.Since(start).Nanoseconds()))
 			fmt.Printf("%d/%d mangas loaded at %.2f manga/sec (%d have images)....\n",
 				ct, len(itemsManga), avgIterTime, countHaveImages)
 		}
@@ -180,7 +235,7 @@ func main() {
 	}
 
 	// Print out the number of covers we found
-	fmt.Printf("done processing mappings!\n")
+	fmt.Printf("done processing alternative images!\n")
 	for key, value := range countHaveImagesExternal {
 		fmt.Printf("\t %s had %d covers found\n", key, value)
 	}
