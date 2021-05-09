@@ -187,7 +187,6 @@ func main() {
 			continue
 		}
 
-
 		// Get the mangadex@home url we will download the images from
 		// robustly re-try a few times if we fail
 		opts := mangadex.AtHomeApiGetAtHomeServerChapterIdOpts{}
@@ -229,7 +228,7 @@ func main() {
 				for data := range dataCh {
 					// robustly re-try to download a few times
 					success := false
-					for retryCount := 0; retryCount <= 3 && !success; retryCount++ {
+					for retryCount := 0; retryCount < 2 && !success; retryCount++ {
 						success = downloadChapterImage(chapterPath, chapter, data, mdexAtHome.BaseUrl)
 						if success {
 							fmt.Printf("\t- downloaded %s\n", data)

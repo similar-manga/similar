@@ -18,8 +18,6 @@ import (
 	"time"
 )
 
-
-
 func main() {
 
 	// Directory configuration

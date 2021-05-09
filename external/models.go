@@ -22,7 +22,6 @@ type ResponseAnimeList struct {
 	} `json:"pictures"`
 }
 
-
 type ResponseKitsuSearch struct {
 	Data []struct {
 		ID    string `json:"id"`
@@ -207,9 +206,3 @@ type ResponseKitsuSearch struct {
 		Last  string `json:"last"`
 	} `json:"links"`
 }
-
-
-
-
-
-

@@ -1,18 +1,17 @@
 # Similar Manga Recommendations
 
-This repo has both the scraping and matching utilities to find mangas which are close in content to others.
-The idea is to create a recommendation system outside MangaDex since there isn't one and thus allow for users to discover other content.
-Right now it is pretty rudimentary, but seems to give ok results most of the time.
-If you want to use it, please download [Neko](https://github.com/CarlosEsco/Neko) and enable recommendations inside the app or use the [Chrome Extension](https://chrome.google.com/webstore/detail/mangadex-similar-manga/ghjofcifjnbpgfjbbnbeeipjlhnmbefl).
-
-
-
+This repo has both the scraping and matching utilities to find mangas which are close in content to others. The idea is
+to create a recommendation system outside MangaDex since there isn't one and thus allow for users to discover other
+content. Right now it is pretty rudimentary, but seems to give ok results most of the time. If you want to use it,
+please download [Neko](https://github.com/CarlosEsco/Neko) and enable recommendations inside the app or use
+the [Chrome Extension](https://chrome.google.com/webstore/detail/mangadex-similar-manga/ghjofcifjnbpgfjbbnbeeipjlhnmbefl)
+.
 
 ## Setup / Dependencies
 
-Client was generated using [swagger](https://editor.swagger.io/).
-You will need to setup a [golang workspace](https://golang.org/doc/install), and then run the following commands.
-Only manga need to be downloaded / scraped from mangadex to be able to perform similar manga identification.
+Client was generated using [swagger](https://editor.swagger.io/). You will need to setup
+a [golang workspace](https://golang.org/doc/install), and then run the following commands. Only manga need to be
+downloaded / scraped from mangadex to be able to perform similar manga identification.
 
 ```
 go get golang.org/x/oauth2
@@ -20,7 +19,6 @@ go get github.com/antihax/optional
 go get github.com/james-bowman/nlp
 go get github.com/PuerkitoBio/goquery
 ```
-
 
 ## Manga Links Data
 
