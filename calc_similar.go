@@ -9,7 +9,6 @@ import (
 	"github.com/james-bowman/nlp/measures/pairwise"
 	"github.com/james-bowman/sparse"
 	"gonum.org/v1/gonum/mat"
-	_ "gonum.org/v1/gonum/mat"
 	"io/ioutil"
 	"log"
 	"math"
@@ -114,7 +113,7 @@ func main() {
 	for j := 0; j < len(mangas); j++ {
 
 		// This manga we will try to match to
-		manga :=  mangas[j]
+		manga := mangas[j]
 		vTag := lsiTag.(mat.ColViewer).ColView(j)
 		vDesc := lsiDesc.(mat.ColViewer).ColView(j)
 
@@ -150,7 +149,7 @@ func main() {
 		similarMangaData.ContentRating = manga.Data.Attributes.ContentRating
 		similarMangaData.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05+00:00")
 		fmt.Printf("manga %d -> %s\n", j, manga.Data.Attributes.Title["en"])
-		fmt.Printf("%s\n",corpusTag[j])
+		fmt.Printf("%s\n", corpusTag[j])
 
 		// Finally loop through all our matches and try to find the best ones!
 		for _, match := range matches {
@@ -173,7 +172,7 @@ func main() {
 
 			// Otherwise lets append it!
 			fmt.Printf("\t - matched to id %d (%.3f score) -> %s\n", id, match.Distance, mangas[id].Data.Attributes.Title["en"])
-			fmt.Printf("\t - %s\n",corpusTag[id])
+			fmt.Printf("\t - %s\n", corpusTag[id])
 			matchData := similar.SimilarMatch{}
 			matchData.Id = mangas[id].Data.Id
 			matchData.Title = mangas[id].Data.Attributes.Title
@@ -197,6 +196,5 @@ func main() {
 		fmt.Printf("%d/%d processed at %.2f manga/sec....\n\n", j+1, len(mangas), avgIterTime)
 
 	}
-
 
 }

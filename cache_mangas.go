@@ -84,7 +84,7 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 			//fmt.Printf("%d/%d -> %s\n", currentOffset+int32(i), maxOffset, manga.Data.Id)
 			if !(*mangasDownloaded)[manga.Data.Id] {
 				file, _ := json.MarshalIndent(manga, "", " ")
-				_ = ioutil.WriteFile(dirMangas + manga.Data.Id + ".json", file, 0644)
+				_ = ioutil.WriteFile(dirMangas+manga.Data.Id+".json", file, 0644)
 				(*mangasDownloaded)[manga.Data.Id] = true
 			}
 		}
