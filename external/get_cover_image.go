@@ -125,7 +125,7 @@ func GetCoverAniList(id string) string {
 func GetCoverMyAnimeList(id string) string {
 
 	// Rate limit if we have not waited enough
-	minMilliBetween := int64(50)
+	minMilliBetween := int64(500)
 	timeSinceLast := time.Since(lastTimeCoverMAL)
 	if timeSinceLast.Milliseconds() < minMilliBetween {
 		milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
@@ -165,7 +165,7 @@ func GetCoverMyAnimeList(id string) string {
 func GetCoverMangaUpdates(id string) string {
 
 	// Rate limit if we have not waited enough
-	minMilliBetween := int64(50)
+	minMilliBetween := int64(500)
 	timeSinceLast := time.Since(lastTimeCoverMU)
 	if timeSinceLast.Milliseconds() < minMilliBetween {
 		milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
@@ -205,7 +205,7 @@ func GetCoverMangaUpdates(id string) string {
 func GetCoverAnimePlanet(id string) string {
 
 	// Rate limit if we have not waited enough
-	minMilliBetween := int64(50)
+	minMilliBetween := int64(500)
 	timeSinceLast := time.Since(lastTimeCoverAP)
 	if timeSinceLast.Milliseconds() < minMilliBetween {
 		milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
