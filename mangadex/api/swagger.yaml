@@ -103,27 +103,27 @@ info:
     email: mangadexstaff@gmail.com
   version: 5.0.0
 servers:
-- url: https://api.mangadex.org
-  description: MangaDex Api
+  - url: https://api.mangadex.org
+    description: MangaDex Api
 security:
-- Bearer: []
+  - Bearer: [ ]
 tags:
-- name: Manga
-- name: Author
-- name: Search
-- name: Auth
-- name: ScanlationGroup
-- name: Feed
-- name: CustomList
-- name: Captcha
-- name: AtHome
-- name: Legacy
-- name: Infrastructure
+  - name: Manga
+  - name: Author
+  - name: Search
+  - name: Auth
+  - name: ScanlationGroup
+  - name: Feed
+  - name: CustomList
+  - name: Captcha
+  - name: AtHome
+  - name: Legacy
+  - name: Infrastructure
 paths:
   /ping:
     get:
       tags:
-      - Infrastructure
+        - Infrastructure
       summary: Ping the server
       responses:
         "200":
@@ -134,199 +134,199 @@ paths:
                 type: string
                 default: pong
                 x-content-type: application/json
-      security: []
+      security: [ ]
   /manga:
     get:
       tags:
-      - Manga
-      - Search
+        - Manga
+        - Search
       summary: Manga list
       description: Search a list of Manga.
       operationId: get-search-manga
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: title
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: authors
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: title
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
             type: string
-            format: uuid
-      - name: artists
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
+        - name: authors
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: artists
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: year
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: includedTags
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: includedTagsMode
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
             type: string
-            format: uuid
-      - name: year
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: includedTags
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: includedTagsMode
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          default: AND
-          enum:
-          - AND
-          - OR
-      - name: excludedTags
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: excludedTagsMode
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          default: OR
-          enum:
-          - AND
-          - OR
-      - name: status
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            type: string
+            default: AND
             enum:
-            - ongoing
-            - completed
-            - hiatus
-            - abandoned
-      - name: originalLanguage
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            pattern: "^[a-zA-Z\\-]{2,5}$"
+              - AND
+              - OR
+        - name: excludedTags
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: excludedTagsMode
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
             type: string
-      - name: publicationDemographic
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            type: string
+            default: OR
             enum:
-            - shonen
-            - shoujo
-            - josei
-            - seinen
-            - none
-      - name: ids
-        in: query
-        description: Manga ids (limited to 100 per request)
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: contentRating
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            type: string
-            enum:
-            - safe
-            - suggestive
-            - erotica
-            - pornographic
-      - name: createdAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+              - AND
+              - OR
+        - name: status
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ongoing
+                - completed
+                - hiatus
+                - abandoned
+        - name: originalLanguage
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              pattern: "^[a-zA-Z\\-]{2,5}$"
+              type: string
+        - name: publicationDemographic
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - shonen
+                - shoujo
+                - josei
+                - seinen
+                - none
+        - name: ids
+          in: query
+          description: Manga ids (limited to 100 per request)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: contentRating
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - safe
+                - suggestive
+                - erotica
+                - pornographic
+        - name: createdAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: updatedAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: updatedAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: order
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/order'
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: order
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            $ref: '#/components/schemas/order'
       responses:
         "200":
           description: Manga list
@@ -348,10 +348,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
     post:
       tags:
-      - Manga
+        - Manga
       summary: Create Manga
       description: Create a new Manga.
       operationId: post-manga
@@ -383,20 +383,20 @@ paths:
   /manga/{id}:
     get:
       tags:
-      - Manga
+        - Manga
       summary: View Manga
       description: View Manga.
       operationId: get-manga-id
       parameters:
-      - name: id
-        in: path
-        description: Manga ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Manga ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -412,22 +412,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
     put:
       tags:
-      - Manga
+        - Manga
       summary: Update Manga
       operationId: put-manga-id
       parameters:
-      - name: id
-        in: path
-        description: Manga ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Manga ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       requestBody:
         description: This body is limited to 16kb max per call.
         content:
@@ -461,19 +461,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-      - Manga
+        - Manga
       summary: Delete Manga
       operationId: delete-manga-id
       parameters:
-      - name: id
-        in: path
-        description: Manga ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Manga ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Manga has been deleted.
@@ -496,7 +496,7 @@ paths:
   /auth/login:
     post:
       tags:
-      - Auth
+        - Auth
       summary: Login
       operationId: post-auth-login
       requestBody:
@@ -520,11 +520,11 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         "401":
           description: Unauthorized
-      security: []
+      security: [ ]
   /auth/check:
     get:
       tags:
-      - Auth
+        - Auth
       summary: Check token
       operationId: get-auth-check
       responses:
@@ -537,7 +537,7 @@ paths:
   /auth/logout:
     post:
       tags:
-      - Auth
+        - Auth
       summary: Logout
       operationId: post-auth-logout
       responses:
@@ -556,7 +556,7 @@ paths:
   /auth/refresh:
     post:
       tags:
-      - Auth
+        - Auth
       summary: Refresh token
       operationId: post-auth-refresh
       requestBody:
@@ -590,11 +590,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RefreshResponse'
-      security: []
+      security: [ ]
   /account/create:
     post:
       tags:
-      - Account
+        - Account
       summary: Create Account
       operationId: post-account-create
       requestBody:
@@ -616,22 +616,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
   /account/activate/{code}:
     get:
       tags:
-      - Account
+        - Account
       summary: Activate account
       operationId: get-account-activate-code
       parameters:
-      - name: code
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          pattern: "[0-9a-fA-F-]+"
-          type: string
+        - name: code
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            pattern: "[0-9a-fA-F-]+"
+            type: string
       responses:
         "200":
           description: OK
@@ -651,49 +651,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
   /group:
     get:
       tags:
-      - ScanlationGroup
-      - Search
+        - ScanlationGroup
+        - Search
       summary: Scanlation Group list
       operationId: get-search-group
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: ids
-        in: query
-        description: ScanlationGroup ids (limited to 100 per request)
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: ids
+          in: query
+          description: ScanlationGroup ids (limited to 100 per request)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: name
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
             type: string
-            format: uuid
-      - name: name
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: OK
@@ -715,10 +715,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
     post:
       tags:
-      - ScanlationGroup
+        - ScanlationGroup
       summary: Create Scanlation Group
       operationId: post-group
       requestBody:
@@ -749,19 +749,19 @@ paths:
   /group/{id}:
     get:
       tags:
-      - ScanlationGroup
+        - ScanlationGroup
       summary: View Scanlation Group
       operationId: get-group-id
       parameters:
-      - name: id
-        in: path
-        description: Scanlation Group ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Scanlation Group ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -777,22 +777,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
     put:
       tags:
-      - ScanlationGroup
+        - ScanlationGroup
       summary: Update Scanlation Group
       operationId: put-group-id
       parameters:
-      - name: id
-        in: path
-        description: Scanlation Group ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Scanlation Group ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       requestBody:
         description: This body is limited to 8kb max per call.
         content:
@@ -826,19 +826,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-      - ScanlationGroup
+        - ScanlationGroup
       summary: Delete Scanlation Group
       operationId: delete-group-id
       parameters:
-      - name: id
-        in: path
-        description: Scanlation Group ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Scanlation Group ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -861,18 +861,18 @@ paths:
   /group/{id}/follow:
     post:
       tags:
-      - ScanlationGroup
+        - ScanlationGroup
       summary: Follow Scanlation Group
       operationId: post-group-id-follow
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -888,18 +888,18 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-      - ScanlationGroup
+        - ScanlationGroup
       summary: Unfollow Scanlation Group
       operationId: delete-group-id-follow
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -916,7 +916,7 @@ paths:
   /list:
     post:
       tags:
-      - CustomList
+        - CustomList
       summary: Create CustomList
       operationId: post-list
       requestBody:
@@ -947,19 +947,19 @@ paths:
   /list/{id}:
     get:
       tags:
-      - CustomList
+        - CustomList
       summary: Get CustomList
       operationId: get-list-id
       parameters:
-      - name: id
-        in: path
-        description: CustomList ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: CustomList ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -971,20 +971,20 @@ paths:
           description: No Content
     put:
       tags:
-      - CustomList
+        - CustomList
       summary: Update CustomList
       description: This body is limited to 8kb max per call.
       operationId: put-list-id
       parameters:
-      - name: id
-        in: path
-        description: CustomList ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: CustomList ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -1017,19 +1017,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-      - CustomList
+        - CustomList
       summary: Delete CustomList
       operationId: delete-list-id
       parameters:
-      - name: id
-        in: path
-        description: CustomList ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: CustomList ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1052,29 +1052,29 @@ paths:
   /manga/{id}/list/{listId}:
     post:
       tags:
-      - Manga
-      - CustomList
+        - Manga
+        - CustomList
       summary: Add Manga in CustomList
       operationId: post-manga-id-list-listId
       parameters:
-      - name: id
-        in: path
-        description: Manga ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
-      - name: listId
-        in: path
-        description: CustomList ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Manga ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
+        - name: listId
+          in: path
+          description: CustomList ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1096,29 +1096,29 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-      - CustomList
-      - Manga
+        - CustomList
+        - Manga
       summary: Remove Manga in CustomList
       operationId: delete-manga-id-list-listId
       parameters:
-      - name: id
-        in: path
-        description: Manga ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
-      - name: listId
-        in: path
-        description: CustomList ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Manga ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
+        - name: listId
+          in: path
+          description: CustomList ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1141,27 +1141,27 @@ paths:
   /user/list:
     get:
       tags:
-      - CustomList
+        - CustomList
       summary: Get logged User CustomList list
       description: 'This will list public and private CustomList '
       operationId: get-user-list
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
@@ -1172,36 +1172,36 @@ paths:
   /user/{id}/list:
     get:
       tags:
-      - CustomList
+        - CustomList
       summary: Get User's CustomList list
       description: This will list only public CustomList
       operationId: get-user-id-list
       parameters:
-      - name: id
-        in: path
-        description: User ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
@@ -1212,19 +1212,19 @@ paths:
   /user/{id}:
     get:
       tags:
-      - User
+        - User
       summary: Get User
       operationId: get-user-id
       parameters:
-      - name: id
-        in: path
-        description: User ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1235,132 +1235,132 @@ paths:
   /chapter:
     get:
       tags:
-      - Chapter
-      - Search
+        - Chapter
+        - Search
       summary: Chapter list
       description: "Chapter list, if you want Chapters for a given Manga, please check\
         \ at feeds endpoints."
       operationId: get-chapter
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: ids
-        in: query
-        description: Chapter ids (limited to 100 per request)
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: ids
+          in: query
+          description: Chapter ids (limited to 100 per request)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: title
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: groups
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: uploader
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
             type: string
             format: uuid
-      - name: title
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: groups
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
+        - name: manga
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
             type: string
             format: uuid
-      - name: uploader
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          format: uuid
-      - name: manga
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-          format: uuid
-      - name: volume
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: chapter
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: translatedLanguage
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^[a-zA-Z\\-]{2,5}$"
-          type: string
-      - name: createdAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+        - name: volume
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: chapter
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: translatedLanguage
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^[a-zA-Z\\-]{2,5}$"
+            type: string
+        - name: createdAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: updatedAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: updatedAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: publishAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: publishAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: order
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          $ref: '#/components/schemas/order_1'
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: order
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            $ref: '#/components/schemas/order_1'
       responses:
         "200":
           description: Chapter list
@@ -1382,23 +1382,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
   /chapter/{id}:
     get:
       tags:
-      - Chapter
+        - Chapter
       summary: Get Chapter
       operationId: get-chapter-id
       parameters:
-      - name: id
-        in: path
-        description: Chapter ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Chapter ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1417,18 +1417,18 @@ paths:
                         title: string
                         translatedLanguage: jp
                         pages:
-                        - string
+                          - string
                         checksums:
-                        - property1: string
-                          property2: string
+                          - property1: string
+                            property2: string
                         uploader: 4df808f4-cdf8-4d1c-80e6-4af8e6ce09b8
                         version: 1
                         groups:
-                        - 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          - 497f6eca-6276-4993-bfeb-53cbbbba6f08
                         manga: e7116dd3-e4ad-4d10-a3ef-6a64d730c341
                     relationships:
-                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
-                      type: string
+                      - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                        type: string
         "204":
           description: No Content
         "403":
@@ -1437,22 +1437,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
     put:
       tags:
-      - Chapter
+        - Chapter
       summary: Update Chapter
       operationId: put-chapter-id
       parameters:
-      - name: id
-        in: path
-        description: Chapter ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Chapter ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       requestBody:
         description: This body is limited to 32kb max per call.
         content:
@@ -1486,19 +1486,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-      - Manga
+        - Manga
       summary: Delete Chapter
       operationId: delete-chapter-id
       parameters:
-      - name: id
-        in: path
-        description: Chapter ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Chapter ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Chapter has been deleted.
@@ -1527,67 +1527,67 @@ paths:
   /user/follows/manga/feed:
     get:
       tags:
-      - Manga
-      - Feed
+        - Manga
+        - Feed
       summary: Get logged User followed Manga feed
       operationId: get-user-follows-manga-feed
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 500
-          type: integer
-          default: 100
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: locales
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            pattern: "^[a-zA-Z\\-]{2,5}$"
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 500
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: locales
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              pattern: "^[a-zA-Z\\-]{2,5}$"
+              type: string
+        - name: createdAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            d$"
             type: string
-      - name: createdAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: updatedAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: updatedAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: publishAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: publishAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
-            d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
       responses:
         "200":
           description: OK
@@ -1606,75 +1606,75 @@ paths:
   /list/{id}/feed:
     get:
       tags:
-      - CustomList
-      - Feed
+        - CustomList
+        - Feed
       summary: CustomList Manga feed
       operationId: get-list-id-feed
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 500
-          type: integer
-          default: 100
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: locales
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            pattern: "^[a-zA-Z\\-]{2,5}$"
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
             type: string
-      - name: createdAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            format: uuid
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 500
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: locales
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              pattern: "^[a-zA-Z\\-]{2,5}$"
+              type: string
+        - name: createdAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: updatedAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: updatedAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: publishAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: publishAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
       responses:
         "200":
           description: OK
@@ -1703,18 +1703,18 @@ paths:
   /manga/{id}/follow:
     post:
       tags:
-      - Manga
+        - Manga
       summary: Follow Manga
       operationId: post-manga-id-follow
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1730,18 +1730,18 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-      - Manga
+        - Manga
       summary: Unfollow Manga
       operationId: delete-manga-id-follow
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1758,45 +1758,45 @@ paths:
   /author:
     get:
       tags:
-      - Author
-      - Search
+        - Author
+        - Search
       summary: Author list
       operationId: get-author
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: ids
-        in: query
-        description: Author ids (limited to 100 per request)
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: ids
+          in: query
+          description: Author ids (limited to 100 per request)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: name
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
             type: string
-            format: uuid
-      - name: name
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: string
       responses:
         "200":
           description: OK
@@ -1818,10 +1818,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
     post:
       tags:
-      - Author
+        - Author
       summary: Create Author
       operationId: post-author
       requestBody:
@@ -1852,19 +1852,19 @@ paths:
   /author/{id}:
     get:
       tags:
-      - Author
+        - Author
       summary: Get Author
       operationId: get-author-id
       parameters:
-      - name: id
-        in: path
-        description: Author ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Author ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1880,22 +1880,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
     put:
       tags:
-      - Author
+        - Author
       summary: Update Author
       operationId: put-author-id
       parameters:
-      - name: id
-        in: path
-        description: Author ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Author ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       requestBody:
         description: This body is limited to 2kb max per call.
         content:
@@ -1929,19 +1929,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-      - Author
+        - Author
       summary: Delete Author
       operationId: delete-author-id
       parameters:
-      - name: id
-        in: path
-        description: Author ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          description: Author ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -1964,7 +1964,7 @@ paths:
   /legacy/mapping:
     post:
       tags:
-      - Legacy
+        - Legacy
       summary: Legacy ID mapping
       operationId: post-legacy-mapping
       requestBody:
@@ -1989,79 +1989,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
   /manga/{id}/feed:
     get:
       tags:
-      - Manga
+        - Manga
       summary: Manga feed
       operationId: get-manga-id-feed
       parameters:
-      - name: id
-        in: path
-        description: Manga ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 500
-          type: integer
-          default: 100
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-      - name: locales
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: array
-          items:
-            pattern: "^[a-zA-Z\\-]{2,5}$"
+        - name: id
+          in: path
+          description: Manga ID
+          required: true
+          style: simple
+          explode: false
+          schema:
             type: string
-      - name: createdAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            format: uuid
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 500
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+        - name: locales
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              pattern: "^[a-zA-Z\\-]{2,5}$"
+              type: string
+        - name: createdAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: updatedAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: updatedAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
-      - name: publishAtSince
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+        - name: publishAtSince
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            pattern: "^\\d{4}-[0-1]\\d-([0-2]\\d|3[0-1])T([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\\
             d$"
-          type: string
-          description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
+            type: string
+            description: "DateTime string with following format: YYYY-MM-DDTHH:MM:SS"
       responses:
         "200":
           description: OK
@@ -2075,24 +2075,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
   /manga/{id}/read:
     get:
       tags:
-      - Manga
+        - Manga
       summary: Manga read markers
       description: A list of chapter ids that are marked as read for the specified
         manga
       operationId: get-manga-chapter-readmarkers
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -2105,25 +2105,25 @@ paths:
                   value:
                     result: ok
                     data:
-                    - 00057883-357b-4734-9469-52967e59ef4c
-                    - 000b7978-d9bd-49ec-a8f6-a0737368415f
-                    - 0015b621-a175-47f5-81fb-5976c88e18c4
+                      - 00057883-357b-4734-9469-52967e59ef4c
+                      - 000b7978-d9bd-49ec-a8f6-a0737368415f
+                      - 0015b621-a175-47f5-81fb-5976c88e18c4
   /chapter/{id}/read:
     post:
       tags:
-      - Chapter
+        - Chapter
       summary: Mark Chapter read
       description: Mark chapter as read for the current user
       operationId: chapter-id-read
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -2133,19 +2133,19 @@ paths:
                 $ref: '#/components/schemas/inline_response_200_1'
     delete:
       tags:
-      - Chapter
+        - Chapter
       summary: Mark Chapter unread
       description: Mark chapter as unread for the current user
       operationId: chapter-id-unread
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: OK
@@ -2156,10 +2156,10 @@ paths:
   /manga/random:
     get:
       tags:
-      - Manga
+        - Manga
       summary: Get a random Manga
       operationId: get-manga-random
-      parameters: []
+      parameters: [ ]
       responses:
         "200":
           description: OK
@@ -2167,31 +2167,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MangaResponse'
-      security: []
+      security: [ ]
   /at-home/server/{chapterId}:
     get:
       tags:
-      - AtHome
+        - AtHome
       summary: Get MD@Home node URL
       operationId: get-at-home-server-chapterId
       parameters:
-      - name: chapterId
-        in: path
-        description: Chapter ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
-      - name: ssl
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
-          default: false
+        - name: chapterId
+          in: path
+          description: Chapter ID
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
+        - name: ssl
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: boolean
+            default: false
       responses:
         "200":
           description: OK
@@ -2205,11 +2205,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
   /manga/tag:
     get:
       tags:
-      - Manga
+        - Manga
       summary: Tag list
       operationId: get-manga-tag
       responses:
@@ -2222,11 +2222,11 @@ paths:
                 items:
                   $ref: '#/components/schemas/TagResponse'
                 x-content-type: application/json
-      security: []
+      security: [ ]
   /account/activate/resend:
     post:
       tags:
-      - Account
+        - Account
       summary: Resend Activation code
       operationId: post-account-activate-resend
       requestBody:
@@ -2248,11 +2248,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
   /account/recover:
     post:
       tags:
-      - Account
+        - Account
       summary: Recover given Account
       operationId: post-account-recover
       requestBody:
@@ -2274,21 +2274,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/'
-      security: []
+      security: [ ]
   /account/recover/{code}:
     post:
       tags:
-      - Account
+        - Account
       summary: Complete Account recover
       operationId: post-account-recover-code
       parameters:
-      - name: code
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: code
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       requestBody:
         description: This body is limited to 2kb max per call.
         content:
@@ -2308,11 +2308,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
   /user/me:
     get:
       tags:
-      - User
+        - User
       summary: Logged User details
       operationId: get-user-me
       responses:
@@ -2325,27 +2325,27 @@ paths:
   /user/follows/group:
     get:
       tags:
-      - ScanlationGroup
-      - User
+        - ScanlationGroup
+        - User
       summary: Get logged User followed Groups
       operationId: get-user-follows-group
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
@@ -2356,26 +2356,26 @@ paths:
   /user/follows/user:
     get:
       tags:
-      - User
+        - User
       summary: Get logged User followed User list
       operationId: get-user-follows-user
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
@@ -2386,27 +2386,27 @@ paths:
   /user/follows/manga:
     get:
       tags:
-      - Manga
-      - User
+        - Manga
+        - User
       summary: Get logged User followed Manga list
       operationId: get-user-follows-manga
       parameters:
-      - name: limit
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          maximum: 100
-          type: integer
-          default: 10
-      - name: offset
-        in: query
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
@@ -2417,7 +2417,7 @@ paths:
   /manga/status:
     get:
       tags:
-      - Manga
+        - Manga
       summary: Get all Manga reading status for logged User
       operationId: get-manga-status
       responses:
@@ -2430,18 +2430,18 @@ paths:
   /manga/{id}/status:
     post:
       tags:
-      - Manga
+        - Manga
       summary: Update Manga reading status
       operationId: post-manga-id-status
       parameters:
-      - name: id
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
       requestBody:
         description: Using a `null` value in `status` field will remove the Manga
           reading status. This body is limited to 2kb max per call.
@@ -2471,7 +2471,7 @@ paths:
   /captcha/solve:
     post:
       tags:
-      - Captcha
+        - Captcha
       summary: Solve Captcha
       description: "Captchas can be solved explicitly through this endpoint, another\
         \ way is to add a `X-Captcha-Result` header to any request. The same logic\
@@ -2505,7 +2505,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
-      - Bearer: []
+        - Bearer: [ ]
 components:
   schemas:
     MangaRequest:
@@ -2551,18 +2551,18 @@ components:
           type: string
           nullable: true
           enum:
-          - shonen
-          - shoujo
-          - josei
-          - seinen
+            - shonen
+            - shoujo
+            - josei
+            - seinen
         status:
           type: string
           nullable: true
           enum:
-          - ongoing
-          - completed
-          - hiatus
-          - abandoned
+            - ongoing
+            - completed
+            - hiatus
+            - abandoned
         year:
           maximum: 9999
           minimum: 1
@@ -2571,8 +2571,8 @@ components:
           type: string
           nullable: true
           enum:
-          - hentai
-          - ecchi
+            - hentai
+            - ecchi
         modNotes:
           type: string
           nullable: true
@@ -2593,8 +2593,8 @@ components:
         result:
           type: string
           enum:
-          - ok
-          - ko
+            - ok
+            - ko
         data:
           $ref: '#/components/schemas/Manga'
         relationships:
@@ -2604,10 +2604,10 @@ components:
       example:
         result: ok
         relationships:
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
         data:
           attributes:
             lastVolume: lastVolume
@@ -2620,17 +2620,17 @@ components:
             lastChapter: lastChapter
             version: 1
             tags:
-            - ""
-            - ""
+              - ""
+              - ""
             altTitles:
-            - ""
-            - ""
+              - ""
+              - ""
             publicationDemographic: publicationDemographic
             createdAt: createdAt
             isLocked: true
             links:
-            - ""
-            - ""
+              - ""
+              - ""
             contentRating: contentRating
             status: status
             updatedAt: updatedAt
@@ -2643,8 +2643,8 @@ components:
         result:
           type: string
           enum:
-          - ok
-          - ko
+            - ok
+            - ko
         data:
           $ref: '#/components/schemas/Chapter'
         relationships:
@@ -2654,18 +2654,18 @@ components:
       example:
         result: ok
         relationships:
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
         data:
           attributes:
             volume: 0
             chapter: chapter
             createdAt: createdAt
             data:
-            - data
-            - data
+              - data
+              - data
             uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
             publishAt: publishAt
             translatedLanguage: translatedLanguage
@@ -2673,8 +2673,8 @@ components:
             version: 1
             hash: hash
             dataSaver:
-            - dataSaver
-            - dataSaver
+              - dataSaver
+              - dataSaver
             updatedAt: updatedAt
           id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: chapter
@@ -2700,7 +2700,7 @@ components:
         type:
           type: string
           enum:
-          - chapter
+            - chapter
         attributes:
           $ref: '#/components/schemas/ChapterAttributes'
       example:
@@ -2709,8 +2709,8 @@ components:
           chapter: chapter
           createdAt: createdAt
           data:
-          - data
-          - data
+            - data
+            - data
           uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           publishAt: publishAt
           translatedLanguage: translatedLanguage
@@ -2718,8 +2718,8 @@ components:
           version: 1
           hash: hash
           dataSaver:
-          - dataSaver
-          - dataSaver
+            - dataSaver
+            - dataSaver
           updatedAt: updatedAt
         id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         type: chapter
@@ -2734,20 +2734,20 @@ components:
             uploader:
               id: 23d52040-3a77-4ffe-84dd-6dbf259e32ed
               type: user
-              attributes: []
+              attributes: [ ]
             manga:
               id: 439ea5a9-e922-44d1-b9c1-a3e1158bd55f
               type: manga
-              attributes: []
+              attributes: [ ]
             groups:
-            - id: cb4cf9ac-ee21-486f-ab0f-21b17ba0ab7f
-              type: scanlation_group
-              attributes: []
+              - id: cb4cf9ac-ee21-486f-ab0f-21b17ba0ab7f
+                type: scanlation_group
+                attributes: [ ]
             translatedLanguage: en
             pages:
-            - 1.jpg
-            - 2.jpg
-            - 3.jpg
+              - 1.jpg
+              - 2.jpg
+              - 3.jpg
             checksums:
               default:
                 "1.jpg": 64a0f5b9d22053b311f1d34cae7183763281350354f2a0b0e552315c38843e0f
@@ -2768,7 +2768,7 @@ components:
         type:
           type: string
           enum:
-          - manga
+            - manga
         attributes:
           $ref: '#/components/schemas/MangaAttributes'
       example:
@@ -2783,17 +2783,17 @@ components:
           lastChapter: lastChapter
           version: 1
           tags:
-          - ""
-          - ""
+            - ""
+            - ""
           altTitles:
-          - ""
-          - ""
+            - ""
+            - ""
           publicationDemographic: publicationDemographic
           createdAt: createdAt
           isLocked: true
           links:
-          - ""
-          - ""
+            - ""
+            - ""
           contentRating: contentRating
           status: status
           updatedAt: updatedAt
@@ -2809,9 +2809,9 @@ components:
               de: Deutscher Titel
               jp: 日本語題名
             altTitles:
-            - en: Secondary english title
-            - en: Third english title
-            - romaji: Romaji title
+              - en: Secondary english title
+              - en: Third english title
+              - romaji: Romaji title
             description:
               en: Nice description
             isLocked: false
@@ -2883,8 +2883,8 @@ components:
         chapter: chapter
         createdAt: createdAt
         data:
-        - data
-        - data
+          - data
+          - data
         uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         publishAt: publishAt
         translatedLanguage: translatedLanguage
@@ -2892,8 +2892,8 @@ components:
         version: 1
         hash: hash
         dataSaver:
-        - dataSaver
-        - dataSaver
+          - dataSaver
+          - dataSaver
         updatedAt: updatedAt
     MangaAttributes:
       title: MangaAttributes
@@ -2905,7 +2905,7 @@ components:
             type: string
         altTitles:
           type: array
-          items: {}
+          items: { }
         description:
           type: object
           additionalProperties:
@@ -2915,7 +2915,7 @@ components:
         links:
           type: array
           nullable: true
-          items: {}
+          items: { }
         originalLanguage:
           type: string
         lastVolume:
@@ -2937,7 +2937,7 @@ components:
           nullable: true
         tags:
           type: array
-          items: {}
+          items: { }
         version:
           minimum: 1
           type: integer
@@ -2956,35 +2956,35 @@ components:
         lastChapter: lastChapter
         version: 1
         tags:
-        - ""
-        - ""
+          - ""
+          - ""
         altTitles:
-        - ""
-        - ""
+          - ""
+          - ""
         publicationDemographic: publicationDemographic
         createdAt: createdAt
         isLocked: true
         links:
-        - ""
-        - ""
+          - ""
+          - ""
         contentRating: contentRating
         status: status
         updatedAt: updatedAt
     MangaCreate:
       allOf:
-      - $ref: '#/components/schemas/MangaRequest'
-      - required:
-        - title
+        - $ref: '#/components/schemas/MangaRequest'
+        - required:
+            - title
     MangaEdit:
       allOf:
-      - $ref: '#/components/schemas/MangaRequest'
-      - required:
-        - version
+        - $ref: '#/components/schemas/MangaRequest'
+        - required:
+            - version
     ChapterEdit:
       allOf:
-      - $ref: '#/components/schemas/ChapterRequest'
-      - required:
-        - version
+        - $ref: '#/components/schemas/ChapterRequest'
+        - required:
+            - version
     Response:
       title: Response
       type: object
@@ -2992,15 +2992,15 @@ components:
         result:
           type: string
           enum:
-          - ok
-          - error
+            - ok
+            - error
       example:
         result: ok
     Login:
       title: Login
       required:
-      - password
-      - username
+        - password
+        - username
       type: object
       properties:
         username:
@@ -3019,8 +3019,8 @@ components:
         result:
           type: string
           enum:
-          - ok
-          - ko
+            - ok
+            - ko
         token:
           $ref: '#/components/schemas/LoginResponse_token'
       example:
@@ -3035,8 +3035,8 @@ components:
         ok:
           type: string
           enum:
-          - ok
-          - ko
+            - ok
+            - ko
         isAuthenticated:
           type: boolean
         roles:
@@ -3049,11 +3049,11 @@ components:
             type: string
       example:
         permissions:
-        - permissions
-        - permissions
+          - permissions
+          - permissions
         roles:
-        - roles
-        - roles
+          - roles
+          - roles
         isAuthenticated: true
         ok: ok
     LogoutResponse:
@@ -3063,14 +3063,14 @@ components:
         result:
           type: string
           enum:
-          - ok
-          - error
+            - ok
+            - error
       example:
         result: ok
     RefreshToken:
       title: RefreshToken
       required:
-      - token
+        - token
       type: object
       properties:
         token:
@@ -3080,14 +3080,14 @@ components:
     RefreshResponse:
       title: RefreshResponse
       required:
-      - result
+        - result
       type: object
       properties:
         result:
           type: string
           enum:
-          - ok
-          - error
+            - ok
+            - error
         token:
           $ref: '#/components/schemas/LoginResponse_token'
         message:
@@ -3105,15 +3105,15 @@ components:
         result:
           type: string
           enum:
-          - ok
+            - ok
       example:
         result: ok
     CreateAccount:
       title: CreateAccount
       required:
-      - email
-      - password
-      - username
+        - email
+        - password
+        - username
       type: object
       properties:
         username:
@@ -3134,7 +3134,7 @@ components:
         result:
           type: string
           enum:
-          - ok
+            - ok
         data:
           $ref: '#/components/schemas/ScanlationGroup'
         relationships:
@@ -3144,10 +3144,10 @@ components:
       example:
         result: ok
         relationships:
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
         data:
           attributes:
             leader:
@@ -3172,7 +3172,7 @@ components:
         type:
           type: string
           enum:
-          - scanlation_group
+            - scanlation_group
         attributes:
           $ref: '#/components/schemas/ScanlationGroupAttributes'
       example:
@@ -3225,7 +3225,7 @@ components:
         type:
           type: string
           enum:
-          - user
+            - user
         attributes:
           $ref: '#/components/schemas/UserAttributes'
       example:
@@ -3249,7 +3249,7 @@ components:
     CreateScanlationGroup:
       title: CreateScanlationGroup
       required:
-      - name
+        - name
       type: object
       properties:
         name:
@@ -3267,7 +3267,7 @@ components:
     ScanlationGroupEdit:
       title: ScanlationGroupEdit
       required:
-      - version
+        - version
       type: object
       properties:
         name:
@@ -3286,7 +3286,7 @@ components:
     CustomListCreate:
       title: CustomListCreate
       required:
-      - name
+        - name
       type: object
       properties:
         name:
@@ -3294,8 +3294,8 @@ components:
         visibility:
           type: string
           enum:
-          - public
-          - private
+            - public
+            - private
         manga:
           type: array
           items:
@@ -3306,7 +3306,7 @@ components:
     CustomListEdit:
       title: CustomListEdit
       required:
-      - version
+        - version
       type: object
       properties:
         name:
@@ -3314,8 +3314,8 @@ components:
         visibility:
           type: string
           enum:
-          - public
-          - private
+            - public
+            - private
         manga:
           type: array
           items:
@@ -3331,8 +3331,8 @@ components:
         result:
           type: string
           enum:
-          - ok
-          - error
+            - ok
+            - error
         data:
           $ref: '#/components/schemas/CustomList'
         relationships:
@@ -3342,10 +3342,10 @@ components:
       example:
         result: ok
         relationships:
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
         data:
           attributes:
             owner:
@@ -3369,7 +3369,7 @@ components:
         type:
           type: string
           enum:
-          - custom_list
+            - custom_list
         attributes:
           $ref: '#/components/schemas/CustomListAttributes'
       example:
@@ -3394,8 +3394,8 @@ components:
         visibility:
           type: string
           enum:
-          - private
-          - public
+            - private
+            - public
         owner:
           $ref: '#/components/schemas/User'
         version:
@@ -3426,10 +3426,10 @@ components:
       example:
         result: result
         relationships:
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
         data:
           attributes:
             createdAt: createdAt
@@ -3451,7 +3451,7 @@ components:
         type:
           type: string
           enum:
-          - author
+            - author
         attributes:
           $ref: '#/components/schemas/AuthorAttributes'
       example:
@@ -3494,7 +3494,7 @@ components:
     AuthorEdit:
       title: AuthorEdit
       required:
-      - version
+        - version
       type: object
       properties:
         name:
@@ -3505,7 +3505,7 @@ components:
     AuthorCreate:
       title: AuthorCreate
       required:
-      - name
+        - name
       type: object
       properties:
         name:
@@ -3521,10 +3521,10 @@ components:
         type:
           type: string
           enum:
-          - group
-          - manga
-          - chapter
-          - tag
+            - group
+            - manga
+            - chapter
+            - tag
         ids:
           type: array
           items:
@@ -3537,7 +3537,7 @@ components:
         result:
           type: string
           enum:
-          - ok
+            - ok
         data:
           $ref: '#/components/schemas/MappingId'
         relationships:
@@ -3547,10 +3547,10 @@ components:
       example:
         result: ok
         relationships:
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
         data:
           attributes:
             newId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -3568,7 +3568,7 @@ components:
         type:
           type: string
           enum:
-          - mapping_id
+            - mapping_id
         attributes:
           $ref: '#/components/schemas/MappingIdAttributes'
       example:
@@ -3585,10 +3585,10 @@ components:
         type:
           type: string
           enum:
-          - manga
-          - chapter
-          - group
-          - tag
+            - manga
+            - chapter
+            - group
+            - tag
         legacyId:
           type: integer
         newId:
@@ -3605,7 +3605,7 @@ components:
         result:
           type: string
           enum:
-          - ok
+            - ok
         data:
           $ref: '#/components/schemas/Tag'
         relationships:
@@ -3615,10 +3615,10 @@ components:
       example:
         result: ok
         relationships:
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
         data:
           attributes:
             name:
@@ -3636,7 +3636,7 @@ components:
         type:
           type: string
           enum:
-          - tag
+            - tag
         attributes:
           $ref: '#/components/schemas/TagAttributes'
       example:
@@ -3668,7 +3668,7 @@ components:
         result:
           type: string
           enum:
-          - ok
+            - ok
         data:
           $ref: '#/components/schemas/User'
         relationships:
@@ -3678,10 +3678,10 @@ components:
       example:
         result: ok
         relationships:
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
-        - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
+          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            type: type
         data:
           attributes:
             version: 1
@@ -3691,7 +3691,7 @@ components:
     SendAccountActivationCode:
       title: SendAccountActivationCode
       required:
-      - email
+        - email
       type: object
       properties:
         email:
@@ -3701,7 +3701,7 @@ components:
     RecoverCompleteBody:
       title: RecoverCompleteBody
       required:
-      - newPassword
+        - newPassword
       type: object
       properties:
         newPassword:
@@ -3712,19 +3712,19 @@ components:
     UpdateMangaStatus:
       title: UpdateMangaStatus
       required:
-      - status
+        - status
       type: object
       properties:
         status:
           type: string
           nullable: true
           enum:
-          - reading
-          - on_hold
-          - plan_to_read
-          - dropped
-          - re_reading
-          - completed
+            - reading
+            - on_hold
+            - plan_to_read
+            - dropped
+            - re_reading
+            - completed
     ChapterRequest:
       title: ChapterRequest
       type: object
@@ -3775,40 +3775,40 @@ components:
         offset: 1
         limit: 6
         results:
-        - result: result
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              createdAt: createdAt
-              imageUrl: imageUrl
-              name: name
-              biography:
-                key: biography
-              version: 0
-              updatedAt: updatedAt
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: author
-        - result: result
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              createdAt: createdAt
-              imageUrl: imageUrl
-              name: name
-              biography:
-                key: biography
-              version: 0
-              updatedAt: updatedAt
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: author
+          - result: result
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                createdAt: createdAt
+                imageUrl: imageUrl
+                name: name
+                biography:
+                  key: biography
+                version: 0
+                updatedAt: updatedAt
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: author
+          - result: result
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                createdAt: createdAt
+                imageUrl: imageUrl
+                name: name
+                biography:
+                  key: biography
+                version: 0
+                updatedAt: updatedAt
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: author
     ChapterList:
       title: ChapterList
       type: object
@@ -3828,58 +3828,58 @@ components:
         offset: 5
         limit: 1
         results:
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              volume: 0
-              chapter: chapter
-              createdAt: createdAt
-              data:
-              - data
-              - data
-              uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-              publishAt: publishAt
-              translatedLanguage: translatedLanguage
-              title: title
-              version: 1
-              hash: hash
-              dataSaver:
-              - dataSaver
-              - dataSaver
-              updatedAt: updatedAt
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: chapter
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              volume: 0
-              chapter: chapter
-              createdAt: createdAt
-              data:
-              - data
-              - data
-              uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-              publishAt: publishAt
-              translatedLanguage: translatedLanguage
-              title: title
-              version: 1
-              hash: hash
-              dataSaver:
-              - dataSaver
-              - dataSaver
-              updatedAt: updatedAt
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: chapter
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                volume: 0
+                chapter: chapter
+                createdAt: createdAt
+                data:
+                  - data
+                  - data
+                uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                publishAt: publishAt
+                translatedLanguage: translatedLanguage
+                title: title
+                version: 1
+                hash: hash
+                dataSaver:
+                  - dataSaver
+                  - dataSaver
+                updatedAt: updatedAt
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: chapter
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                volume: 0
+                chapter: chapter
+                createdAt: createdAt
+                data:
+                  - data
+                  - data
+                uploader: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                publishAt: publishAt
+                translatedLanguage: translatedLanguage
+                title: title
+                version: 1
+                hash: hash
+                dataSaver:
+                  - dataSaver
+                  - dataSaver
+                updatedAt: updatedAt
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: chapter
     ScanlationGroupList:
       title: ScanlationGroupList
       type: object
@@ -3899,46 +3899,46 @@ components:
         offset: 1
         limit: 6
         results:
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              leader:
-                attributes:
-                  version: 1
-                  username: username
-                id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-                type: user
-              createdAt: createdAt
-              name: name
-              version: 1
-              updatedAt: updatedAt
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: scanlation_group
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              leader:
-                attributes:
-                  version: 1
-                  username: username
-                id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-                type: user
-              createdAt: createdAt
-              name: name
-              version: 1
-              updatedAt: updatedAt
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: scanlation_group
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                leader:
+                  attributes:
+                    version: 1
+                    username: username
+                  id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                  type: user
+                createdAt: createdAt
+                name: name
+                version: 1
+                updatedAt: updatedAt
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: scanlation_group
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                leader:
+                  attributes:
+                    version: 1
+                    username: username
+                  id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                  type: user
+                createdAt: createdAt
+                name: name
+                version: 1
+                updatedAt: updatedAt
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: scanlation_group
     MangaList:
       title: MangaList
       type: object
@@ -3958,74 +3958,74 @@ components:
         offset: 5
         limit: 1
         results:
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              lastVolume: lastVolume
-              year: 0
-              description:
-                key: description
-              title:
-                key: title
-              originalLanguage: originalLanguage
-              lastChapter: lastChapter
-              version: 1
-              tags:
-              - ""
-              - ""
-              altTitles:
-              - ""
-              - ""
-              publicationDemographic: publicationDemographic
-              createdAt: createdAt
-              isLocked: true
-              links:
-              - ""
-              - ""
-              contentRating: contentRating
-              status: status
-              updatedAt: updatedAt
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: manga
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              lastVolume: lastVolume
-              year: 0
-              description:
-                key: description
-              title:
-                key: title
-              originalLanguage: originalLanguage
-              lastChapter: lastChapter
-              version: 1
-              tags:
-              - ""
-              - ""
-              altTitles:
-              - ""
-              - ""
-              publicationDemographic: publicationDemographic
-              createdAt: createdAt
-              isLocked: true
-              links:
-              - ""
-              - ""
-              contentRating: contentRating
-              status: status
-              updatedAt: updatedAt
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: manga
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                lastVolume: lastVolume
+                year: 0
+                description:
+                  key: description
+                title:
+                  key: title
+                originalLanguage: originalLanguage
+                lastChapter: lastChapter
+                version: 1
+                tags:
+                  - ""
+                  - ""
+                altTitles:
+                  - ""
+                  - ""
+                publicationDemographic: publicationDemographic
+                createdAt: createdAt
+                isLocked: true
+                links:
+                  - ""
+                  - ""
+                contentRating: contentRating
+                status: status
+                updatedAt: updatedAt
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: manga
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                lastVolume: lastVolume
+                year: 0
+                description:
+                  key: description
+                title:
+                  key: title
+                originalLanguage: originalLanguage
+                lastChapter: lastChapter
+                version: 1
+                tags:
+                  - ""
+                  - ""
+                altTitles:
+                  - ""
+                  - ""
+                publicationDemographic: publicationDemographic
+                createdAt: createdAt
+                isLocked: true
+                links:
+                  - ""
+                  - ""
+                contentRating: contentRating
+                status: status
+                updatedAt: updatedAt
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: manga
     CustomListList:
       title: CustomListList
       type: object
@@ -4045,44 +4045,44 @@ components:
         offset: 6
         limit: 0
         results:
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              owner:
-                attributes:
-                  version: 1
-                  username: username
-                id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-                type: user
-              visibility: private
-              name: name
-              version: 1
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: custom_list
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              owner:
-                attributes:
-                  version: 1
-                  username: username
-                id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-                type: user
-              visibility: private
-              name: name
-              version: 1
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: custom_list
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                owner:
+                  attributes:
+                    version: 1
+                    username: username
+                  id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                  type: user
+                visibility: private
+                name: name
+                version: 1
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: custom_list
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                owner:
+                  attributes:
+                    version: 1
+                    username: username
+                  id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                  type: user
+                visibility: private
+                name: name
+                version: 1
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: custom_list
     UserList:
       title: UserList
       type: object
@@ -4102,68 +4102,68 @@ components:
         offset: 6
         limit: 0
         results:
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              version: 1
-              username: username
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: user
-        - result: ok
-          relationships:
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: type
-          data:
-            attributes:
-              version: 1
-              username: username
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            type: user
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                version: 1
+                username: username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: user
+          - result: ok
+            relationships:
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+              - id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+                type: type
+            data:
+              attributes:
+                version: 1
+                username: username
+              id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+              type: user
     order:
       type: object
       properties:
         createdAt:
           type: string
           enum:
-          - asc
-          - desc
+            - asc
+            - desc
         updatedAt:
           type: string
           enum:
-          - asc
-          - desc
+            - asc
+            - desc
     order_1:
       type: object
       properties:
         createdAt:
           type: string
           enum:
-          - asc
-          - desc
+            - asc
+            - desc
         updatedAt:
           type: string
           enum:
-          - asc
-          - desc
+            - asc
+            - desc
         publishAt:
           type: string
           enum:
-          - asc
-          - desc
+            - asc
+            - desc
     inline_response_200:
       type: object
       properties:
         result:
           type: string
           enum:
-          - ok
+            - ok
         data:
           type: array
           items:
@@ -4172,16 +4172,16 @@ components:
       example:
         result: ok
         data:
-        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
     inline_response_200_1:
       type: object
       properties:
         result:
           type: string
           enum:
-          - ok
-          - ko
+            - ok
+            - ko
       example:
         result: ok
     inline_response_200_2:
@@ -4203,12 +4203,12 @@ components:
           additionalProperties:
             type: string
             enum:
-            - reading
-            - on_hold
-            - plan_to_read
-            - dropped
-            - re_reading
-            - completed
+              - reading
+              - on_hold
+              - plan_to_read
+              - dropped
+              - re_reading
+              - completed
       example:
         result: ok
         statuses:
@@ -4216,7 +4216,7 @@ components:
           "2394a5c7-1d2e-461f-acde-18726b9e37d6": dropped
     body:
       required:
-      - captchaChallenge
+        - captchaChallenge
       type: object
       properties:
         captchaChallenge:

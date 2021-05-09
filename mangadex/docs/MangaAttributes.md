@@ -1,6 +1,7 @@
 # MangaAttributes
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Title** | **map[string]string** |  | [optional] [default to null]

@@ -1,6 +1,7 @@
 # InlineResponse2002
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **BaseUrl** | **string** | MD@Home server URL | [optional] [default to null]

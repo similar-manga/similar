@@ -10,8 +10,8 @@
 package mangadex
 
 type ModelError struct {
-	Id string `json:"id,omitempty"`
-	Status int32 `json:"status,omitempty"`
-	Title string `json:"title,omitempty"`
+	Id     string `json:"id,omitempty"`
+	Status int32  `json:"status,omitempty"`
+	Title  string `json:"title,omitempty"`
 	Detail string `json:"detail,omitempty"`
 }

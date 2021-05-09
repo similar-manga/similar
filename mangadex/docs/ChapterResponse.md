@@ -1,6 +1,7 @@
 # ChapterResponse
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Result** | **string** |  | [optional] [default to null]

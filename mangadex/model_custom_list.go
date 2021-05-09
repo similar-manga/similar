@@ -10,7 +10,7 @@
 package mangadex
 
 type CustomList struct {
-	Id string `json:"id,omitempty"`
-	Type_ string `json:"type,omitempty"`
+	Id         string                `json:"id,omitempty"`
+	Type_      string                `json:"type,omitempty"`
 	Attributes *CustomListAttributes `json:"attributes,omitempty"`
 }

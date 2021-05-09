@@ -1,6 +1,7 @@
 # CustomListList
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Results** | [**[]CustomListResponse**](CustomListResponse.md) |  | [optional] [default to null]

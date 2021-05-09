@@ -1,6 +1,7 @@
 # ChapterEdit
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Title** | **string** |  | [optional] [default to null]

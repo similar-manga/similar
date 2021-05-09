@@ -1,6 +1,7 @@
 # RefreshResponse
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Result** | **string** |  | [default to null]

@@ -1,6 +1,7 @@
 # RecoverCompleteBody
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **NewPassword** | **string** |  | [default to null]

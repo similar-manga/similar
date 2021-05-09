@@ -1,4 +1,3 @@
-
 /*
  * MangaDex API
  *
@@ -12,11 +11,11 @@ package mangadex
 
 import (
 	"context"
+	"github.com/antihax/optional"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
-	"github.com/antihax/optional"
 )
 
 // Linger please
@@ -25,30 +24,31 @@ var (
 )
 
 type SearchApiService service
+
 /*
 SearchApiService Author list
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *SearchApiGetAuthorOpts - Optional Parameters:
-     * @param "Limit" (optional.Int32) - 
-     * @param "Offset" (optional.Int32) - 
+     * @param "Limit" (optional.Int32) -
+     * @param "Offset" (optional.Int32) -
      * @param "Ids" (optional.Interface of []string) -  Author ids (limited to 100 per request)
-     * @param "Name" (optional.String) - 
+     * @param "Name" (optional.String) -
 @return AuthorList
 */
 
 type SearchApiGetAuthorOpts struct {
-    Limit optional.Int32
-    Offset optional.Int32
-    Ids optional.Interface
-    Name optional.String
+	Limit  optional.Int32
+	Offset optional.Int32
+	Ids    optional.Interface
+	Name   optional.String
 }
 
 func (a *SearchApiService) GetAuthor(ctx context.Context, localVarOptionals *SearchApiGetAuthorOpts) (AuthorList, *http.Response, error) {
 	var (
-		localVarHttpMethod = strings.ToUpper("Get")
-		localVarPostBody   interface{}
-		localVarFileName   string
-		localVarFileBytes  []byte
+		localVarHttpMethod  = strings.ToUpper("Get")
+		localVarPostBody    interface{}
+		localVarFileName    string
+		localVarFileBytes   []byte
 		localVarReturnValue AuthorList
 	)
 
@@ -106,97 +106,98 @@ func (a *SearchApiService) GetAuthor(ctx context.Context, localVarOptionals *Sea
 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+		if err == nil {
 			return localVarReturnValue, localVarHttpResponse, err
 		}
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericSwaggerError{
-			body: localVarBody,
+			body:  localVarBody,
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
 			var v AuthorList
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		if localVarHttpResponse.StatusCode == 400 {
 			var v ErrorResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		if localVarHttpResponse.StatusCode == 403 {
 			var v ErrorResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
+
 /*
 SearchApiService Chapter list
 Chapter list, if you want Chapters for a given Manga, please check at feeds endpoints.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *SearchApiGetChapterOpts - Optional Parameters:
-     * @param "Limit" (optional.Int32) - 
-     * @param "Offset" (optional.Int32) - 
+     * @param "Limit" (optional.Int32) -
+     * @param "Offset" (optional.Int32) -
      * @param "Ids" (optional.Interface of []string) -  Chapter ids (limited to 100 per request)
-     * @param "Title" (optional.String) - 
-     * @param "Groups" (optional.Interface of []string) - 
-     * @param "Uploader" (optional.Interface of string) - 
-     * @param "Manga" (optional.Interface of string) - 
-     * @param "Volume" (optional.String) - 
-     * @param "Chapter" (optional.String) - 
-     * @param "TranslatedLanguage" (optional.String) - 
-     * @param "CreatedAtSince" (optional.String) - 
-     * @param "UpdatedAtSince" (optional.String) - 
-     * @param "PublishAtSince" (optional.String) - 
-     * @param "Order" (optional.Interface of Order1) - 
+     * @param "Title" (optional.String) -
+     * @param "Groups" (optional.Interface of []string) -
+     * @param "Uploader" (optional.Interface of string) -
+     * @param "Manga" (optional.Interface of string) -
+     * @param "Volume" (optional.String) -
+     * @param "Chapter" (optional.String) -
+     * @param "TranslatedLanguage" (optional.String) -
+     * @param "CreatedAtSince" (optional.String) -
+     * @param "UpdatedAtSince" (optional.String) -
+     * @param "PublishAtSince" (optional.String) -
+     * @param "Order" (optional.Interface of Order1) -
 @return ChapterList
 */
 
 type SearchApiGetChapterOpts struct {
-    Limit optional.Int32
-    Offset optional.Int32
-    Ids optional.Interface
-    Title optional.String
-    Groups optional.Interface
-    Uploader optional.Interface
-    Manga optional.Interface
-    Volume optional.String
-    Chapter optional.String
-    TranslatedLanguage optional.String
-    CreatedAtSince optional.String
-    UpdatedAtSince optional.String
-    PublishAtSince optional.String
-    Order optional.Interface
+	Limit              optional.Int32
+	Offset             optional.Int32
+	Ids                optional.Interface
+	Title              optional.String
+	Groups             optional.Interface
+	Uploader           optional.Interface
+	Manga              optional.Interface
+	Volume             optional.String
+	Chapter            optional.String
+	TranslatedLanguage optional.String
+	CreatedAtSince     optional.String
+	UpdatedAtSince     optional.String
+	PublishAtSince     optional.String
+	Order              optional.Interface
 }
 
 func (a *SearchApiService) GetChapter(ctx context.Context, localVarOptionals *SearchApiGetChapterOpts) (ChapterList, *http.Response, error) {
 	var (
-		localVarHttpMethod = strings.ToUpper("Get")
-		localVarPostBody   interface{}
-		localVarFileName   string
-		localVarFileBytes  []byte
+		localVarHttpMethod  = strings.ToUpper("Get")
+		localVarPostBody    interface{}
+		localVarFileName    string
+		localVarFileBytes   []byte
 		localVarReturnValue ChapterList
 	)
 
@@ -284,76 +285,77 @@ func (a *SearchApiService) GetChapter(ctx context.Context, localVarOptionals *Se
 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+		if err == nil {
 			return localVarReturnValue, localVarHttpResponse, err
 		}
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericSwaggerError{
-			body: localVarBody,
+			body:  localVarBody,
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
 			var v ChapterList
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		if localVarHttpResponse.StatusCode == 400 {
 			var v ErrorResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		if localVarHttpResponse.StatusCode == 403 {
 			var v ErrorResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
+
 /*
 SearchApiService Scanlation Group list
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *SearchApiGetSearchGroupOpts - Optional Parameters:
-     * @param "Limit" (optional.Int32) - 
-     * @param "Offset" (optional.Int32) - 
+     * @param "Limit" (optional.Int32) -
+     * @param "Offset" (optional.Int32) -
      * @param "Ids" (optional.Interface of []string) -  ScanlationGroup ids (limited to 100 per request)
-     * @param "Name" (optional.String) - 
+     * @param "Name" (optional.String) -
 @return ScanlationGroupList
 */
 
 type SearchApiGetSearchGroupOpts struct {
-    Limit optional.Int32
-    Offset optional.Int32
-    Ids optional.Interface
-    Name optional.String
+	Limit  optional.Int32
+	Offset optional.Int32
+	Ids    optional.Interface
+	Name   optional.String
 }
 
 func (a *SearchApiService) GetSearchGroup(ctx context.Context, localVarOptionals *SearchApiGetSearchGroupOpts) (ScanlationGroupList, *http.Response, error) {
 	var (
-		localVarHttpMethod = strings.ToUpper("Get")
-		localVarPostBody   interface{}
-		localVarFileName   string
-		localVarFileBytes  []byte
+		localVarHttpMethod  = strings.ToUpper("Get")
+		localVarPostBody    interface{}
+		localVarFileName    string
+		localVarFileBytes   []byte
 		localVarReturnValue ScanlationGroupList
 	)
 
@@ -411,105 +413,106 @@ func (a *SearchApiService) GetSearchGroup(ctx context.Context, localVarOptionals
 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+		if err == nil {
 			return localVarReturnValue, localVarHttpResponse, err
 		}
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericSwaggerError{
-			body: localVarBody,
+			body:  localVarBody,
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
 			var v ScanlationGroupList
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		if localVarHttpResponse.StatusCode == 400 {
 			var v ErrorResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		if localVarHttpResponse.StatusCode == 403 {
 			var v ErrorResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
+
 /*
 SearchApiService Manga list
 Search a list of Manga.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *SearchApiGetSearchMangaOpts - Optional Parameters:
-     * @param "Limit" (optional.Int32) - 
-     * @param "Offset" (optional.Int32) - 
-     * @param "Title" (optional.String) - 
-     * @param "Authors" (optional.Interface of []string) - 
-     * @param "Artists" (optional.Interface of []string) - 
-     * @param "Year" (optional.Int32) - 
-     * @param "IncludedTags" (optional.Interface of []string) - 
-     * @param "IncludedTagsMode" (optional.String) - 
-     * @param "ExcludedTags" (optional.Interface of []string) - 
-     * @param "ExcludedTagsMode" (optional.String) - 
-     * @param "Status" (optional.Interface of []string) - 
-     * @param "OriginalLanguage" (optional.Interface of []string) - 
-     * @param "PublicationDemographic" (optional.Interface of []string) - 
+     * @param "Limit" (optional.Int32) -
+     * @param "Offset" (optional.Int32) -
+     * @param "Title" (optional.String) -
+     * @param "Authors" (optional.Interface of []string) -
+     * @param "Artists" (optional.Interface of []string) -
+     * @param "Year" (optional.Int32) -
+     * @param "IncludedTags" (optional.Interface of []string) -
+     * @param "IncludedTagsMode" (optional.String) -
+     * @param "ExcludedTags" (optional.Interface of []string) -
+     * @param "ExcludedTagsMode" (optional.String) -
+     * @param "Status" (optional.Interface of []string) -
+     * @param "OriginalLanguage" (optional.Interface of []string) -
+     * @param "PublicationDemographic" (optional.Interface of []string) -
      * @param "Ids" (optional.Interface of []string) -  Manga ids (limited to 100 per request)
-     * @param "ContentRating" (optional.Interface of []string) - 
-     * @param "CreatedAtSince" (optional.String) - 
-     * @param "UpdatedAtSince" (optional.String) - 
-     * @param "Order" (optional.Interface of Order) - 
+     * @param "ContentRating" (optional.Interface of []string) -
+     * @param "CreatedAtSince" (optional.String) -
+     * @param "UpdatedAtSince" (optional.String) -
+     * @param "Order" (optional.Interface of Order) -
 @return MangaList
 */
 
 type SearchApiGetSearchMangaOpts struct {
-    Limit optional.Int32
-    Offset optional.Int32
-    Title optional.String
-    Authors optional.Interface
-    Artists optional.Interface
-    Year optional.Int32
-    IncludedTags optional.Interface
-    IncludedTagsMode optional.String
-    ExcludedTags optional.Interface
-    ExcludedTagsMode optional.String
-    Status optional.Interface
-    OriginalLanguage optional.Interface
-    PublicationDemographic optional.Interface
-    Ids optional.Interface
-    ContentRating optional.Interface
-    CreatedAtSince optional.String
-    UpdatedAtSince optional.String
-    Order optional.Interface
+	Limit                  optional.Int32
+	Offset                 optional.Int32
+	Title                  optional.String
+	Authors                optional.Interface
+	Artists                optional.Interface
+	Year                   optional.Int32
+	IncludedTags           optional.Interface
+	IncludedTagsMode       optional.String
+	ExcludedTags           optional.Interface
+	ExcludedTagsMode       optional.String
+	Status                 optional.Interface
+	OriginalLanguage       optional.Interface
+	PublicationDemographic optional.Interface
+	Ids                    optional.Interface
+	ContentRating          optional.Interface
+	CreatedAtSince         optional.String
+	UpdatedAtSince         optional.String
+	Order                  optional.Interface
 }
 
 func (a *SearchApiService) GetSearchManga(ctx context.Context, localVarOptionals *SearchApiGetSearchMangaOpts) (MangaList, *http.Response, error) {
 	var (
-		localVarHttpMethod = strings.ToUpper("Get")
-		localVarPostBody   interface{}
-		localVarFileName   string
-		localVarFileBytes  []byte
+		localVarHttpMethod  = strings.ToUpper("Get")
+		localVarPostBody    interface{}
+		localVarFileName    string
+		localVarFileBytes   []byte
 		localVarReturnValue MangaList
 	)
 
@@ -609,46 +612,46 @@ func (a *SearchApiService) GetSearchManga(ctx context.Context, localVarOptionals
 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+		if err == nil {
 			return localVarReturnValue, localVarHttpResponse, err
 		}
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
 		newErr := GenericSwaggerError{
-			body: localVarBody,
+			body:  localVarBody,
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
 			var v MangaList
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		if localVarHttpResponse.StatusCode == 400 {
 			var v ErrorResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		if localVarHttpResponse.StatusCode == 403 {
 			var v ErrorResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
 				return localVarReturnValue, localVarHttpResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}

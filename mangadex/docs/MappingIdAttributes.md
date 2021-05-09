@@ -1,6 +1,7 @@
 # MappingIdAttributes
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Type_** | **string** |  | [optional] [default to null]

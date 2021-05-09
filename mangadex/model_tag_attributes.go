@@ -10,6 +10,6 @@
 package mangadex
 
 type TagAttributes struct {
-	Name map[string]string `json:"name,omitempty"`
-	Version int32 `json:"version,omitempty"`
+	Name    map[string]string `json:"name,omitempty"`
+	Version int32             `json:"version,omitempty"`
 }

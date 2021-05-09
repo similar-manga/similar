@@ -10,7 +10,7 @@
 package mangadex
 
 type ScanlationGroup struct {
-	Id string `json:"id,omitempty"`
-	Type_ string `json:"type,omitempty"`
+	Id         string                     `json:"id,omitempty"`
+	Type_      string                     `json:"type,omitempty"`
 	Attributes *ScanlationGroupAttributes `json:"attributes,omitempty"`
 }

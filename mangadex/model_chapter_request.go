@@ -10,11 +10,11 @@
 package mangadex
 
 type ChapterRequest struct {
-	Title string `json:"title,omitempty"`
-	Volume int32 `json:"volume,omitempty"`
-	Chapter string `json:"chapter,omitempty"`
-	TranslatedLanguage string `json:"translatedLanguage,omitempty"`
-	Pages []string `json:"pages,omitempty"`
-	Checksums []map[string]string `json:"checksums,omitempty"`
-	Version int32 `json:"version,omitempty"`
+	Title              string              `json:"title,omitempty"`
+	Volume             int32               `json:"volume,omitempty"`
+	Chapter            string              `json:"chapter,omitempty"`
+	TranslatedLanguage string              `json:"translatedLanguage,omitempty"`
+	Pages              []string            `json:"pages,omitempty"`
+	Checksums          []map[string]string `json:"checksums,omitempty"`
+	Version            int32               `json:"version,omitempty"`
 }

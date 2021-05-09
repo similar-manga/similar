@@ -1,6 +1,7 @@
 # SendAccountActivationCode
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Email** | **string** |  | [default to null]

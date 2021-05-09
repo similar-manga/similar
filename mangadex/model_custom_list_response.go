@@ -10,7 +10,7 @@
 package mangadex
 
 type CustomListResponse struct {
-	Result string `json:"result,omitempty"`
-	Data *CustomList `json:"data,omitempty"`
+	Result        string         `json:"result,omitempty"`
+	Data          *CustomList    `json:"data,omitempty"`
 	Relationships []Relationship `json:"relationships,omitempty"`
 }

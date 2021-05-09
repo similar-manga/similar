@@ -10,9 +10,9 @@
 package mangadex
 
 type ScanlationGroupAttributes struct {
-	Name string `json:"name,omitempty"`
-	Leader *User `json:"leader,omitempty"`
-	Version int32 `json:"version,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Leader    *User  `json:"leader,omitempty"`
+	Version   int32  `json:"version,omitempty"`
 	CreatedAt string `json:"createdAt,omitempty"`
 	UpdatedAt string `json:"updatedAt,omitempty"`
 }

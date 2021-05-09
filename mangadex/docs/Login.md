@@ -1,6 +1,7 @@
 # Login
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Username** | **string** |  | [default to null]

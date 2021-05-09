@@ -10,6 +10,6 @@
 package mangadex
 
 type MappingIdBody struct {
-	Type_ string `json:"type,omitempty"`
-	Ids []int32 `json:"ids,omitempty"`
+	Type_ string  `json:"type,omitempty"`
+	Ids   []int32 `json:"ids,omitempty"`
 }

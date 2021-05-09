@@ -10,7 +10,7 @@
 package mangadex
 
 type RefreshResponse struct {
-	Result string `json:"result"`
-	Token *LoginResponseToken `json:"token,omitempty"`
-	Message string `json:"message,omitempty"`
+	Result  string              `json:"result"`
+	Token   *LoginResponseToken `json:"token,omitempty"`
+	Message string              `json:"message,omitempty"`
 }

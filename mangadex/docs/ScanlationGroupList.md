@@ -1,6 +1,7 @@
 # ScanlationGroupList
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Results** | [**[]ScanlationGroupResponse**](ScanlationGroupResponse.md) |  | [optional] [default to null]

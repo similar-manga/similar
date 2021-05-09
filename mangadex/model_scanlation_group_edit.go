@@ -10,8 +10,8 @@
 package mangadex
 
 type ScanlationGroupEdit struct {
-	Name string `json:"name,omitempty"`
-	Leader string `json:"leader,omitempty"`
+	Name    string   `json:"name,omitempty"`
+	Leader  string   `json:"leader,omitempty"`
 	Members []string `json:"members,omitempty"`
-	Version int32 `json:"version"`
+	Version int32    `json:"version"`
 }

@@ -1,6 +1,7 @@
 # RefreshToken
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Token** | **string** |  | [default to null]

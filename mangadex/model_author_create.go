@@ -10,6 +10,6 @@
 package mangadex
 
 type AuthorCreate struct {
-	Name string `json:"name"`
-	Version int32 `json:"version,omitempty"`
+	Name    string `json:"name"`
+	Version int32  `json:"version,omitempty"`
 }

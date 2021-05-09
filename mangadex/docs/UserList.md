@@ -1,6 +1,7 @@
 # UserList
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Results** | [**[]UserResponse**](UserResponse.md) |  | [optional] [default to null]

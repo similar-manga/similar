@@ -1,6 +1,7 @@
 # AuthorList
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Results** | [**[]AuthorResponse**](AuthorResponse.md) |  | [optional] [default to null]

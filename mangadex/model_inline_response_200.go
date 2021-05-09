@@ -10,6 +10,6 @@
 package mangadex
 
 type InlineResponse200 struct {
-	Result string `json:"result,omitempty"`
-	Data []string `json:"data,omitempty"`
+	Result string   `json:"result,omitempty"`
+	Data   []string `json:"data,omitempty"`
 }

@@ -10,7 +10,7 @@
 package mangadex
 
 type MappingIdResponse struct {
-	Result string `json:"result,omitempty"`
-	Data *MappingId `json:"data,omitempty"`
+	Result        string         `json:"result,omitempty"`
+	Data          *MappingId     `json:"data,omitempty"`
 	Relationships []Relationship `json:"relationships,omitempty"`
 }

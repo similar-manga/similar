@@ -191,7 +191,7 @@ paths:
       summary: Ping the server
       tags:
         - Infrastructure
-      security: []
+      security: [ ]
       responses:
         '200':
           description: Pong
@@ -368,7 +368,7 @@ paths:
                   - desc
           in: query
           name: order
-      security: []
+      security: [ ]
     post:
       summary: Create Manga
       operationId: post-manga
@@ -430,7 +430,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       operationId: get-manga-id
       description: View Manga.
-      security: []
+      security: [ ]
     put:
       summary: Update Manga
       operationId: put-manga-id
@@ -518,7 +518,7 @@ paths:
             schema:
               $ref: '#/components/schemas/Login'
         description: This body is limited to 2kb max per call.
-      security: []
+      security: [ ]
   /auth/check:
     get:
       summary: Check token
@@ -588,7 +588,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RefreshToken'
         description: This body is limited to 2kb max per call.
-      security: []
+      security: [ ]
   /account/create:
     post:
       summary: Create Account
@@ -606,7 +606,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      security: []
+      security: [ ]
       requestBody:
         content:
           application/json:
@@ -647,8 +647,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       operationId: get-account-activate-code
-      parameters: []
-      security: []
+      parameters: [ ]
+      security: [ ]
   /group:
     get:
       summary: Scanlation Group list
@@ -700,7 +700,7 @@ paths:
             type: string
           in: query
           name: name
-      security: []
+      security: [ ]
     post:
       summary: Create Scanlation Group
       operationId: post-group
@@ -760,7 +760,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       operationId: get-group-id
-      security: []
+      security: [ ]
     put:
       summary: Update Scanlation Group
       operationId: put-group-id
@@ -1125,7 +1125,7 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
       operationId: get-user-id
   /chapter:
-    parameters: []
+    parameters: [ ]
     get:
       summary: Chapter list
       description: Chapter list, if you want Chapters for a given Manga, please check at feeds endpoints.
@@ -1245,7 +1245,7 @@ paths:
       tags:
         - Chapter
         - Search
-      security: []
+      security: [ ]
   '/chapter/{id}':
     parameters:
       - schema:
@@ -1300,7 +1300,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       operationId: get-chapter-id
-      security: []
+      security: [ ]
     put:
       summary: Update Chapter
       operationId: put-chapter-id
@@ -1595,7 +1595,7 @@ paths:
             type: string
           in: query
           name: name
-      security: []
+      security: [ ]
     post:
       summary: Create Author
       operationId: post-author
@@ -1655,7 +1655,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       operationId: get-author-id
-      security: []
+      security: [ ]
     put:
       summary: Update Author
       operationId: put-author-id
@@ -1743,7 +1743,7 @@ paths:
             schema:
               $ref: '#/components/schemas/MappingIdBody'
         description: This body is limited to 10kb max per call.
-      security: []
+      security: [ ]
   '/manga/{id}/feed':
     parameters:
       - schema:
@@ -1807,7 +1807,7 @@ paths:
             pattern: ^\d{4}-[0-1]\d-([0-2]\d|3[0-1])T([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d$
           in: query
           name: publishAtSince
-      security: []
+      security: [ ]
   '/manga/{id}/read':
     parameters:
       - schema:
@@ -1906,8 +1906,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/MangaResponse'
       operationId: get-manga-random
-      parameters: []
-      security: []
+      parameters: [ ]
+      security: [ ]
   '/at-home/server/{chapterId}':
     parameters:
       - schema:
@@ -1945,7 +1945,7 @@ paths:
             default: false
           in: query
           name: ssl
-      security: []
+      security: [ ]
   /manga/tag:
     get:
       summary: Tag list
@@ -1961,7 +1961,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TagResponse'
       operationId: get-manga-tag
-      security: []
+      security: [ ]
   /account/activate/resend:
     post:
       summary: Resend Activation code
@@ -1987,7 +1987,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SendAccountActivationCode'
         description: This body is limited to 1kb max per call.
-      security: []
+      security: [ ]
   /account/recover:
     post:
       summary: Recover given Account
@@ -2013,7 +2013,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SendAccountActivationCode'
         description: This body is limited to 1kb max per call.
-      security: []
+      security: [ ]
   '/account/recover/{code}':
     parameters:
       - schema:
@@ -2045,7 +2045,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RecoverCompleteBody'
         description: This body is limited to 2kb max per call.
-      security: []
+      security: [ ]
   /user/me:
     get:
       summary: Logged User details
@@ -2250,7 +2250,7 @@ paths:
 
         Authentication is optional. Captchas are tracked for both the client ip and for the user id, if you are logged in you want to send your session token but that is not required.
       security:
-        - Bearer: []
+        - Bearer: [ ]
 components:
   schemas:
     MangaRequest:
@@ -2384,15 +2384,15 @@ components:
             uploader:
               id: 23d52040-3a77-4ffe-84dd-6dbf259e32ed
               type: user
-              attributes: []
+              attributes: [ ]
             manga:
               id: 439ea5a9-e922-44d1-b9c1-a3e1158bd55f
               type: manga
-              attributes: []
+              attributes: [ ]
             groups:
               - id: cb4cf9ac-ee21-486f-ab0f-21b17ba0ab7f
                 type: scanlation_group
-                attributes: []
+                attributes: [ ]
             translatedLanguage: en
             pages:
               - 1.jpg
@@ -2520,7 +2520,7 @@ components:
             type: string
         altTitles:
           type: array
-          items: {}
+          items: { }
         description:
           type: object
           additionalProperties:
@@ -2530,7 +2530,7 @@ components:
         links:
           type: array
           nullable: true
-          items: {}
+          items: { }
         originalLanguage:
           type: string
         lastVolume:
@@ -2552,7 +2552,7 @@ components:
           nullable: true
         tags:
           type: array
-          items: {}
+          items: { }
         version:
           type: integer
           minimum: 1
@@ -3228,4 +3228,4 @@ components:
       type: http
       scheme: bearer
 security:
-  - Bearer: []
+  - Bearer: [ ]

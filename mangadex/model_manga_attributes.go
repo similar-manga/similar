@@ -10,20 +10,20 @@
 package mangadex
 
 type MangaAttributes struct {
-	Title map[string]string `json:"title,omitempty"`
-	AltTitles map[string]string `json:"altTitles,omitempty"`
-	Description map[string]string `json:"description,omitempty"`
-	IsLocked bool `json:"isLocked,omitempty"`
-	Links map[string]string `json:"links,omitempty"`
-	OriginalLanguage string `json:"originalLanguage,omitempty"`
-	LastVolume string `json:"lastVolume,omitempty"`
-	LastChapter string `json:"lastChapter,omitempty"`
-	PublicationDemographic string `json:"publicationDemographic,omitempty"`
-	Status string `json:"status,omitempty"`
-	Year int32 `json:"year,omitempty"`
-	ContentRating string `json:"contentRating,omitempty"`
-	Tags []Tag `json:"tags,omitempty"`
-	Version int32 `json:"version,omitempty"`
-	CreatedAt string `json:"createdAt,omitempty"`
-	UpdatedAt string `json:"updatedAt,omitempty"`
+	Title                  map[string]string `json:"title,omitempty"`
+	AltTitles              map[string]string `json:"altTitles,omitempty"`
+	Description            map[string]string `json:"description,omitempty"`
+	IsLocked               bool              `json:"isLocked,omitempty"`
+	Links                  map[string]string `json:"links,omitempty"`
+	OriginalLanguage       string            `json:"originalLanguage,omitempty"`
+	LastVolume             string            `json:"lastVolume,omitempty"`
+	LastChapter            string            `json:"lastChapter,omitempty"`
+	PublicationDemographic string            `json:"publicationDemographic,omitempty"`
+	Status                 string            `json:"status,omitempty"`
+	Year                   int32             `json:"year,omitempty"`
+	ContentRating          string            `json:"contentRating,omitempty"`
+	Tags                   []Tag             `json:"tags,omitempty"`
+	Version                int32             `json:"version,omitempty"`
+	CreatedAt              string            `json:"createdAt,omitempty"`
+	UpdatedAt              string            `json:"updatedAt,omitempty"`
 }

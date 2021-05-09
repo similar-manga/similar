@@ -1,6 +1,7 @@
 # MangaRequest
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Title** | [***map[string]string**](map.md) |  | [optional] [default to null]

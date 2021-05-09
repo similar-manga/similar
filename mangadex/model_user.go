@@ -10,7 +10,7 @@
 package mangadex
 
 type User struct {
-	Id string `json:"id,omitempty"`
-	Type_ string `json:"type,omitempty"`
+	Id         string          `json:"id,omitempty"`
+	Type_      string          `json:"type,omitempty"`
 	Attributes *UserAttributes `json:"attributes,omitempty"`
 }

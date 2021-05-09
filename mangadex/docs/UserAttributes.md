@@ -1,6 +1,7 @@
 # UserAttributes
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Username** | **string** |  | [optional] [default to null]

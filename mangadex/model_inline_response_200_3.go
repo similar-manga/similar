@@ -10,6 +10,6 @@
 package mangadex
 
 type InlineResponse2003 struct {
-	Result string `json:"result,omitempty"`
+	Result   string            `json:"result,omitempty"`
 	Statuses map[string]string `json:"statuses,omitempty"`
 }

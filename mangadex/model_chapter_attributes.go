@@ -10,16 +10,16 @@
 package mangadex
 
 type ChapterAttributes struct {
-	Title string `json:"title,omitempty"`
-	Volume int32 `json:"volume,omitempty"`
-	Chapter string `json:"chapter,omitempty"`
-	TranslatedLanguage string `json:"translatedLanguage,omitempty"`
-	Hash string `json:"hash,omitempty"`
-	Data []string `json:"data,omitempty"`
-	DataSaver []string `json:"dataSaver,omitempty"`
-	Uploader string `json:"uploader,omitempty"`
-	Version int32 `json:"version,omitempty"`
-	CreatedAt string `json:"createdAt,omitempty"`
-	UpdatedAt string `json:"updatedAt,omitempty"`
-	PublishAt string `json:"publishAt,omitempty"`
+	Title              string   `json:"title,omitempty"`
+	Volume             int32    `json:"volume,omitempty"`
+	Chapter            string   `json:"chapter,omitempty"`
+	TranslatedLanguage string   `json:"translatedLanguage,omitempty"`
+	Hash               string   `json:"hash,omitempty"`
+	Data               []string `json:"data,omitempty"`
+	DataSaver          []string `json:"dataSaver,omitempty"`
+	Uploader           string   `json:"uploader,omitempty"`
+	Version            int32    `json:"version,omitempty"`
+	CreatedAt          string   `json:"createdAt,omitempty"`
+	UpdatedAt          string   `json:"updatedAt,omitempty"`
+	PublishAt          string   `json:"publishAt,omitempty"`
 }

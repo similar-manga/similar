@@ -10,19 +10,19 @@
 package mangadex
 
 type MangaEdit struct {
-	Title *map[string]string `json:"title,omitempty"`
-	AltTitles []map[string]string `json:"altTitles,omitempty"`
-	Description *map[string]string `json:"description,omitempty"`
-	Authors []string `json:"authors,omitempty"`
-	Artists []string `json:"artists,omitempty"`
-	Links []interface{} `json:"links,omitempty"`
-	OriginalLanguage string `json:"originalLanguage,omitempty"`
-	LastVolume int32 `json:"lastVolume,omitempty"`
-	LastChapter int32 `json:"lastChapter,omitempty"`
-	PublicationDemographic string `json:"publicationDemographic,omitempty"`
-	Status string `json:"status,omitempty"`
-	Year int32 `json:"year,omitempty"`
-	ContentRating string `json:"contentRating,omitempty"`
-	ModNotes string `json:"modNotes,omitempty"`
-	Version int32 `json:"version"`
+	Title                  *map[string]string  `json:"title,omitempty"`
+	AltTitles              []map[string]string `json:"altTitles,omitempty"`
+	Description            *map[string]string  `json:"description,omitempty"`
+	Authors                []string            `json:"authors,omitempty"`
+	Artists                []string            `json:"artists,omitempty"`
+	Links                  []interface{}       `json:"links,omitempty"`
+	OriginalLanguage       string              `json:"originalLanguage,omitempty"`
+	LastVolume             int32               `json:"lastVolume,omitempty"`
+	LastChapter            int32               `json:"lastChapter,omitempty"`
+	PublicationDemographic string              `json:"publicationDemographic,omitempty"`
+	Status                 string              `json:"status,omitempty"`
+	Year                   int32               `json:"year,omitempty"`
+	ContentRating          string              `json:"contentRating,omitempty"`
+	ModNotes               string              `json:"modNotes,omitempty"`
+	Version                int32               `json:"version"`
 }

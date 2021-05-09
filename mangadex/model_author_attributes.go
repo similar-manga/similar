@@ -10,10 +10,10 @@
 package mangadex
 
 type AuthorAttributes struct {
-	Name string `json:"name,omitempty"`
-	ImageUrl string `json:"imageUrl,omitempty"`
+	Name      string            `json:"name,omitempty"`
+	ImageUrl  string            `json:"imageUrl,omitempty"`
 	Biography map[string]string `json:"biography,omitempty"`
-	Version int32 `json:"version,omitempty"`
-	CreatedAt string `json:"createdAt,omitempty"`
-	UpdatedAt string `json:"updatedAt,omitempty"`
+	Version   int32             `json:"version,omitempty"`
+	CreatedAt string            `json:"createdAt,omitempty"`
+	UpdatedAt string            `json:"updatedAt,omitempty"`
 }

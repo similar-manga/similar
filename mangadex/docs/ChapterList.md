@@ -1,6 +1,7 @@
 # ChapterList
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Results** | [**[]ChapterResponse**](ChapterResponse.md) |  | [optional] [default to null]

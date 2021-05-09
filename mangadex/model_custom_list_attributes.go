@@ -10,8 +10,8 @@
 package mangadex
 
 type CustomListAttributes struct {
-	Name string `json:"name,omitempty"`
+	Name       string `json:"name,omitempty"`
 	Visibility string `json:"visibility,omitempty"`
-	Owner *User `json:"owner,omitempty"`
-	Version int32 `json:"version,omitempty"`
+	Owner      *User  `json:"owner,omitempty"`
+	Version    int32  `json:"version,omitempty"`
 }

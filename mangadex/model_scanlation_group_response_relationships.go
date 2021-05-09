@@ -10,6 +10,6 @@
 package mangadex
 
 type ScanlationGroupResponseRelationships struct {
-	Id string `json:"id,omitempty"`
+	Id    string `json:"id,omitempty"`
 	Type_ string `json:"type,omitempty"`
 }

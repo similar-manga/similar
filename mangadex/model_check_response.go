@@ -10,8 +10,8 @@
 package mangadex
 
 type CheckResponse struct {
-	Ok string `json:"ok,omitempty"`
-	IsAuthenticated bool `json:"isAuthenticated,omitempty"`
-	Roles []string `json:"roles,omitempty"`
-	Permissions []string `json:"permissions,omitempty"`
+	Ok              string   `json:"ok,omitempty"`
+	IsAuthenticated bool     `json:"isAuthenticated,omitempty"`
+	Roles           []string `json:"roles,omitempty"`
+	Permissions     []string `json:"permissions,omitempty"`
 }

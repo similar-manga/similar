@@ -1,6 +1,7 @@
 # LoginResponseToken
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Session** | **string** |  | [optional] [default to null]

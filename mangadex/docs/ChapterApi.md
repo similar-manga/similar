@@ -11,6 +11,7 @@ Method | HTTP request | Description
 [**PutChapterId**](ChapterApi.md#PutChapterId) | **Put** /chapter/{id} | Update Chapter
 
 # **ChapterIdRead**
+
 > InlineResponse2001 ChapterIdRead(ctx, id)
 Mark Chapter read
 
@@ -20,8 +21,8 @@ Mark chapter as read for the current user
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-  **id** | [**string**](.md)|  | 
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | [**string**](.md)|  |
 
 ### Return type
 
@@ -33,12 +34,13 @@ Name | Type | Description  | Notes
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **ChapterIdUnread**
+
 > InlineResponse2001 ChapterIdUnread(ctx, id)
 Mark Chapter unread
 
@@ -48,8 +50,8 @@ Mark chapter as unread for the current user
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-  **id** | [**string**](.md)|  | 
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | [**string**](.md)|  |
 
 ### Return type
 
@@ -61,12 +63,13 @@ Name | Type | Description  | Notes
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **GetChapter**
+
 > ChapterList GetChapter(ctx, optional)
 Chapter list
 
@@ -76,27 +79,27 @@ Chapter list, if you want Chapters for a given Manga, please check at feeds endp
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
- **optional** | ***ChapterApiGetChapterOpts** | optional parameters | nil if no parameters
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**optional** | ***ChapterApiGetChapterOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
-Optional parameters are passed through a pointer to a ChapterApiGetChapterOpts struct
-Name | Type | Description  | Notes
+
+Optional parameters are passed through a pointer to a ChapterApiGetChapterOpts struct Name | Type | Description | Notes
 ------------- | ------------- | ------------- | -------------
- **limit** | **optional.Int32**|  | [default to 10]
- **offset** | **optional.Int32**|  | 
- **ids** | [**optional.Interface of []string**](string.md)| Chapter ids (limited to 100 per request) | 
- **title** | **optional.String**|  | 
- **groups** | [**optional.Interface of []string**](string.md)|  | 
- **uploader** | [**optional.Interface of string**](.md)|  | 
- **manga** | [**optional.Interface of string**](.md)|  | 
- **volume** | **optional.String**|  | 
- **chapter** | **optional.String**|  | 
- **translatedLanguage** | **optional.String**|  | 
- **createdAtSince** | **optional.String**|  | 
- **updatedAtSince** | **optional.String**|  | 
- **publishAtSince** | **optional.String**|  | 
- **order** | [**optional.Interface of Order1**](.md)|  | 
+**limit** | **optional.Int32**| | [default to 10]
+**offset** | **optional.Int32**| |
+**ids** | [**optional.Interface of []string**](string.md)| Chapter ids (limited to 100 per request) |
+**title** | **optional.String**| |
+**groups** | [**optional.Interface of []string**](string.md)| |
+**uploader** | [**optional.Interface of string**](.md)| |
+**manga** | [**optional.Interface of string**](.md)| |
+**volume** | **optional.String**| |
+**chapter** | **optional.String**| |
+**translatedLanguage** | **optional.String**| |
+**createdAtSince** | **optional.String**| |
+**updatedAtSince** | **optional.String**| |
+**publishAtSince** | **optional.String**| |
+**order** | [**optional.Interface of Order1**](.md)| |
 
 ### Return type
 
@@ -108,12 +111,13 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **GetChapterId**
+
 > ChapterResponse GetChapterId(ctx, id)
 Get Chapter
 
@@ -121,8 +125,8 @@ Get Chapter
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-  **id** | [**string**](.md)| Chapter ID | 
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | [**string**](.md)| Chapter ID |
 
 ### Return type
 
@@ -134,12 +138,13 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **PutChapterId**
+
 > ChapterResponse PutChapterId(ctx, id, optional)
 Update Chapter
 
@@ -147,16 +152,16 @@ Update Chapter
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-  **id** | [**string**](.md)| Chapter ID | 
- **optional** | ***ChapterApiPutChapterIdOpts** | optional parameters | nil if no parameters
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | [**string**](.md)| Chapter ID |
+**optional** | ***ChapterApiPutChapterIdOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
-Optional parameters are passed through a pointer to a ChapterApiPutChapterIdOpts struct
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
 
- **body** | [**optional.Interface of ChapterEdit**](ChapterEdit.md)| This body is limited to 32kb max per call. | 
+Optional parameters are passed through a pointer to a ChapterApiPutChapterIdOpts struct Name | Type | Description |
+Notes ------------- | ------------- | ------------- | -------------
+
+**body** | [**optional.Interface of ChapterEdit**](ChapterEdit.md)| This body is limited to 32kb max per call. |
 
 ### Return type
 
@@ -168,8 +173,8 @@ Name | Type | Description  | Notes
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
- - **Accept**: application/json
+- **Content-Type**: application/json
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

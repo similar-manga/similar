@@ -12,5 +12,5 @@ package mangadex
 type CreateAccount struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Email string `json:"email"`
+	Email    string `json:"email"`
 }

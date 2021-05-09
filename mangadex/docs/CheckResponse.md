@@ -1,6 +1,7 @@
 # CheckResponse
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Ok** | **string** |  | [optional] [default to null]

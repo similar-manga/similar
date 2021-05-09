@@ -10,8 +10,8 @@
 package mangadex
 
 type CustomListCreate struct {
-	Name string `json:"name"`
-	Visibility string `json:"visibility,omitempty"`
-	Manga []string `json:"manga,omitempty"`
-	Version int32 `json:"version,omitempty"`
+	Name       string   `json:"name"`
+	Visibility string   `json:"visibility,omitempty"`
+	Manga      []string `json:"manga,omitempty"`
+	Version    int32    `json:"version,omitempty"`
 }

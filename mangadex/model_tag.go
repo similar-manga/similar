@@ -10,7 +10,7 @@
 package mangadex
 
 type Tag struct {
-	Id string `json:"id,omitempty"`
-	Type_ string `json:"type,omitempty"`
+	Id         string         `json:"id,omitempty"`
+	Type_      string         `json:"type,omitempty"`
 	Attributes *TagAttributes `json:"attributes,omitempty"`
 }

@@ -10,7 +10,7 @@
 package mangadex
 
 type TagResponse struct {
-	Result string `json:"result,omitempty"`
-	Data *Tag `json:"data,omitempty"`
+	Result        string         `json:"result,omitempty"`
+	Data          *Tag           `json:"data,omitempty"`
 	Relationships []Relationship `json:"relationships,omitempty"`
 }

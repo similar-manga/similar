@@ -11,7 +11,7 @@ package mangadex
 
 type AuthorList struct {
 	Results []AuthorResponse `json:"results,omitempty"`
-	Limit int32 `json:"limit,omitempty"`
-	Offset int32 `json:"offset,omitempty"`
-	Total int32 `json:"total,omitempty"`
+	Limit   int32            `json:"limit,omitempty"`
+	Offset  int32            `json:"offset,omitempty"`
+	Total   int32            `json:"total,omitempty"`
 }

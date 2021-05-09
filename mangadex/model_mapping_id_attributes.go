@@ -10,7 +10,7 @@
 package mangadex
 
 type MappingIdAttributes struct {
-	Type_ string `json:"type,omitempty"`
-	LegacyId int32 `json:"legacyId,omitempty"`
-	NewId string `json:"newId,omitempty"`
+	Type_    string `json:"type,omitempty"`
+	LegacyId int32  `json:"legacyId,omitempty"`
+	NewId    string `json:"newId,omitempty"`
 }

@@ -1,6 +1,7 @@
 # MangaList
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Results** | [**[]MangaResponse**](MangaResponse.md) |  | [optional] [default to null]

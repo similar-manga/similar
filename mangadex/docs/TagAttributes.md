@@ -1,6 +1,7 @@
 # TagAttributes
 
 ## Properties
+
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Name** | **map[string]string** |  | [optional] [default to null]

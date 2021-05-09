@@ -10,7 +10,7 @@
 package mangadex
 
 type ChapterResponse struct {
-	Result string `json:"result,omitempty"`
-	Data *Chapter `json:"data,omitempty"`
+	Result        string         `json:"result,omitempty"`
+	Data          *Chapter       `json:"data,omitempty"`
 	Relationships []Relationship `json:"relationships,omitempty"`
 }

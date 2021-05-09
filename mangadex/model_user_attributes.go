@@ -11,5 +11,5 @@ package mangadex
 
 type UserAttributes struct {
 	Username string `json:"username,omitempty"`
-	Version int32 `json:"version,omitempty"`
+	Version  int32  `json:"version,omitempty"`
 }

@@ -10,6 +10,6 @@
 package mangadex
 
 type LoginResponse struct {
-	Result string `json:"result,omitempty"`
-	Token *LoginResponseToken `json:"token,omitempty"`
+	Result string              `json:"result,omitempty"`
+	Token  *LoginResponseToken `json:"token,omitempty"`
 }
