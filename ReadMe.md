@@ -17,6 +17,7 @@ You will need to setup a [golang workspace](https://golang.org/doc/install), and
 go get golang.org/x/oauth2
 go get github.com/antihax/optional
 go get github.com/james-bowman/nlp
+go get github.com/PuerkitoBio/goquery
 ```
 
 
