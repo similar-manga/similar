@@ -1,7 +1,6 @@
 package main
 
 import (
-	"./external"
 	"./mangadex"
 	"./similar"
 	"encoding/json"
@@ -31,9 +30,7 @@ func main() {
 
 	// Loop through all manga and try to get their chapter information for each
 	corpus := []string{}
-	imageUrls := []string{}
 	mangas := []mangadex.MangaResponse{}
-	countHaveImages := 0
 	itemsManga, _ := ioutil.ReadDir(dirMangas)
 	for _, file := range itemsManga {
 
@@ -47,35 +44,13 @@ func main() {
 		fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
 		_ = json.Unmarshal(fileManga, &manga)
 
-		// Get our url for this manga if we can
-		url := ""
-		if _, ok := manga.Data.Attributes.Links["al"]; ok {
-			url = external.GetCoverAniList(manga.Data.Attributes.Links["al"])
-		}
-		if _, ok := manga.Data.Attributes.Links["kt"]; url == "" && ok {
-			url = external.GetCoverKitsu(manga.Data.Attributes.Links["kt"])
-		}
-		if _, ok := manga.Data.Attributes.Links["mal"]; url == "" && ok {
-			url = external.GetCoverMyAnimeList(manga.Data.Attributes.Links["mal"])
-		}
-		if _, ok := manga.Data.Attributes.Links["mu"]; url == "" && ok {
-			url = external.GetCoverMangaUpdates(manga.Data.Attributes.Links["mu"])
-		}
-		if _, ok := manga.Data.Attributes.Links["ap"]; url == "" && ok {
-			url = external.GetCoverAnimePlanet(manga.Data.Attributes.Links["ap"])
-		}
-
 		// Append to the corpus
 		corpus = append(corpus, manga.Data.Attributes.Description["en"])
-		imageUrls = append(imageUrls, url)
 		mangas = append(mangas, manga)
-		if url != "" {
-			countHaveImages++
-		}
 
 		// Debug
 		if len(mangas)%200 == 0 {
-			fmt.Printf("%d/%d mangas loaded (%d have images)....\n", len(mangas), len(itemsManga), countHaveImages)
+			fmt.Printf("%d/%d mangas loaded....\n", len(mangas), len(itemsManga))
 		}
 		if len(mangas) > 300 {
 			break
@@ -135,7 +110,6 @@ func main() {
 		similarMangaData := similar.SimilarManga{}
 		similarMangaData.Id = mangas[j].Data.Id
 		similarMangaData.Title = mangas[j].Data.Attributes.Title
-		similarMangaData.AlternativeCover = imageUrls[j]
 		similarMangaData.ContentRating = mangas[j].Data.Attributes.ContentRating
 		similarMangaData.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05+00:00")
 		fmt.Printf("manga %d received %d matches -> %s\n", j, len(matches), mangas[j].Data.Attributes.Title["en"])
@@ -152,7 +126,6 @@ func main() {
 			matchData := similar.SimilarMatch{}
 			matchData.Id = mangas[id].Data.Id
 			matchData.Title = mangas[id].Data.Attributes.Title
-			matchData.AlternativeCover = imageUrls[id]
 			matchData.ContentRating = mangas[id].Data.Attributes.ContentRating
 			matchData.Score = float32(match.Distance)
 			similarMangaData.SimilarMatches = append(similarMangaData.SimilarMatches, matchData)
