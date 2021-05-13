@@ -23,7 +23,7 @@ func main() {
 	// Directory configuration
 	dirMangas := "../data/manga/"
 	dirSimilar := "../data/similar/"
-	numSimToGet := 10
+	numSimToGet := 25
 	tagScoreRatio := 0.6
 	err := os.MkdirAll(dirSimilar, os.ModePerm)
 	if err != nil {
@@ -109,6 +109,9 @@ func main() {
 
 	// For each manga we will get the top similar for tags and description
 	// We will then combine these into a single score which is then used to rank all manga
+	// TODO: should check if two mangas have a minimum number of tags in common
+	// TODO: should reject matches which are in different languages not supported by the current manga
+	// TODO: skip matched manga that are already a "related" manga
 	start = time.Now()
 	for j := 0; j < len(mangas); j++ {
 
@@ -149,7 +152,7 @@ func main() {
 		similarMangaData.ContentRating = manga.Data.Attributes.ContentRating
 		similarMangaData.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05+00:00")
 		fmt.Printf("manga %d -> %s\n", j, manga.Data.Attributes.Title["en"])
-		fmt.Printf("%s\n", corpusTag[j])
+		//fmt.Printf("%s\n", corpusTag[j])
 
 		// Finally loop through all our matches and try to find the best ones!
 		for _, match := range matches {
@@ -165,6 +168,19 @@ func main() {
 				continue
 			}
 
+			// Skip if no chapters
+			// Loop through the "relationships" and see if any chapter types
+			countChapters := 0
+			for _, relation := range mangas[id].Relationships {
+				if relation.Type_ == "chapter" {
+					countChapters++
+				}
+			}
+			if countChapters < 1 {
+				fmt.Printf("\u001B[1;33m\t - match %d had no chapters! -> %s (%s)\u001B[0m\n", id, mangas[id].Data.Attributes.Title["en"], mangas[id].Data.Id)
+				continue
+			}
+
 			// Tags / content ratings / demographics we enforce
 			if similar.NotValidMatch(manga, mangas[id]) {
 				continue
@@ -172,7 +188,7 @@ func main() {
 
 			// Otherwise lets append it!
 			fmt.Printf("\t - matched to id %d (%.3f score) -> %s\n", id, match.Distance, mangas[id].Data.Attributes.Title["en"])
-			fmt.Printf("\t - %s\n", corpusTag[id])
+			//fmt.Printf("\t - %s\n", corpusTag[id])
 			matchData := similar.SimilarMatch{}
 			matchData.Id = mangas[id].Data.Id
 			matchData.Title = mangas[id].Data.Attributes.Title
