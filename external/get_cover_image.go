@@ -16,49 +16,11 @@ var lastTimeCoverMAL = time.Now()
 var lastTimeCoverMU = time.Now()
 var lastTimeCoverAP = time.Now()
 
-func GetCoverKitsu(id string) string {
+func GetCoverKitsuCdn(id string) string {
 
-	// Rate limit if we have not waited enough
-	minMilliBetween := int64(50)
-	timeSinceLast := time.Since(lastTimeCoverKT)
-	if timeSinceLast.Milliseconds() < minMilliBetween {
-		milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
-		//fmt.Printf("\u001B[1;31mEXTERNAL KT: waiting %d milliseconds\u001B[0m\n", milliToWait)
-		time.Sleep(time.Duration(1e6 * milliToWait))
-	}
-
-	// Query kitsu api for an image
-	// https://kitsu.docs.apiary.io/#reference/manga/manga/fetch-resource
-	//url := "https://kitsu.io/api/edge/manga?filter[slug]=" + id
-	//resp, err := http.Get(url)
-	//lastTimeCoverKT = time.Now()
-	//time.Sleep(500 * time.Millisecond)
-	//if err != nil {
-	//	return ""
-	//}
-	//defer resp.Body.Close()
-	//if resp.StatusCode != 200 {
-	//	fmt.Printf("\u001B[1;31mEXTERNAL KT: http code %d\u001B[0m\n", resp.StatusCode)
-	//	if resp.StatusCode == 429 {
-	//		time.Sleep(time.Second)
-	//	}
-	//	return ""
-	//}
-	//stringData, _ := ioutil.ReadAll(resp.Body)
-	//data := ResponseKitsuSearch{}
-	//err = json.Unmarshal(stringData, &data)
-	//if err != nil {
-	//	return ""
-	//}
-	//if len(data.Data) < 1 {
-	//	return ""
-	//}
-	//return data.Data[0].Attributes.Posterimage.Large
-
-	// Construct the kistu image url
+	// Construct the kistu cdn image url
 	url := "https://media.kitsu.io/manga/poster_images/" + id + "/large.jpg"
 	resp, err := http.Get(url)
-	lastTimeCoverKT = time.Now()
 	if err != nil {
 		return ""
 	}
@@ -71,6 +33,54 @@ func GetCoverKitsu(id string) string {
 		return ""
 	}
 	return url
+
+}
+
+func GetCoverKitsu(id string) string {
+
+	// First try to get it through the cdn
+	// Else we will fallback on getting it through the api
+	url := GetCoverKitsuCdn(id)
+	if url != "" {
+		return url
+	}
+
+	// Rate limit if we have not waited enough
+	minMilliBetween := int64(500)
+	timeSinceLast := time.Since(lastTimeCoverKT)
+	if timeSinceLast.Milliseconds() < minMilliBetween {
+		milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
+		//fmt.Printf("\u001B[1;31mEXTERNAL KT: waiting %d milliseconds\u001B[0m\n", milliToWait)
+		time.Sleep(time.Duration(1e6 * milliToWait))
+	}
+
+	// Query kitsu api for an image
+	// https://kitsu.docs.apiary.io/#reference/manga/manga/fetch-resource
+	url = "https://kitsu.io/api/edge/manga?filter[slug]=" + id
+	resp, err := http.Get(url)
+	lastTimeCoverKT = time.Now()
+	time.Sleep(500 * time.Millisecond)
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		fmt.Printf("\u001B[1;31mEXTERNAL KT: http code %d\u001B[0m\n", resp.StatusCode)
+		if resp.StatusCode == 429 {
+			time.Sleep(time.Second)
+		}
+		return ""
+	}
+	stringData, _ := ioutil.ReadAll(resp.Body)
+	data := ResponseKitsuSearch{}
+	err = json.Unmarshal(stringData, &data)
+	if err != nil {
+		return ""
+	}
+	if len(data.Data) < 1 {
+		return ""
+	}
+	return data.Data[0].Attributes.Posterimage.Large
 
 }
 
@@ -165,7 +175,7 @@ func GetCoverMyAnimeList(id string) string {
 func GetCoverMangaUpdates(id string) string {
 
 	// Rate limit if we have not waited enough
-	minMilliBetween := int64(500)
+	minMilliBetween := int64(600)
 	timeSinceLast := time.Since(lastTimeCoverMU)
 	if timeSinceLast.Milliseconds() < minMilliBetween {
 		milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
