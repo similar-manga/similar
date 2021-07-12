@@ -30,8 +30,9 @@ func writeToCSV(writer *csv.Writer, data []string) {
 func main() {
 
 	// Directory configuration
-	dirMangas := "../data/manga/"
-	dirMappings := "../data/mapping/"
+	dirMangas := "../similar_data/manga/"
+	dirMappings := "../similar_data/mapping/"
+	updateAltCoverMapping := false
 	err := os.MkdirAll(dirMappings, os.ModePerm)
 	if err != nil {
 		log.Fatalf("%v", err)
@@ -112,7 +113,7 @@ func main() {
 		}
 
 		// Our search file
-		data := []string{manga.Data.Id, manga.Data.Attributes.Title["en"], manga.Data.Attributes.ContentRating}
+		data := []string{manga.Data.Id, (*manga.Data.Attributes.Title)["en"], manga.Data.Attributes.ContentRating}
 		writeToCSV(writerSEARCH, data)
 
 		// Save the external mappings
@@ -147,9 +148,8 @@ func main() {
 
 		// Debug
 		if ct%100 == 0 {
-			avgIterTime := float64(ct+1) / (1e-9 * float64(time.Since(start).Nanoseconds()))
-			fmt.Printf("%d/%d mangas loaded at %.2f manga/sec....\n",
-				ct, len(itemsManga), avgIterTime)
+			avgIterTime := float64(ct+1) / time.Since(start).Seconds()
+			fmt.Printf("%d/%d mangas -> processing at %.2f manga/sec....\n", ct+1, len(itemsManga), avgIterTime)
 		}
 
 	}
@@ -172,72 +172,77 @@ func main() {
 	fileMAL.Close()
 
 	// Alternative cover urls for use if we are cache'ing
-	fileAlternativeImage := openCSVFileStream(dirMappings + "mdex2altimage.csv")
-	defer fileAlternativeImage.Close()
-	writerAlternativeImage := csv.NewWriter(fileAlternativeImage)
-	defer writerAlternativeImage.Flush()
+	if updateAltCoverMapping {
 
-	// Loop through all manga and try to get their chapter information for each
-	start = time.Now()
-	countHaveImagesExternal := make(map[string]int)
-	countHaveImages := 0
-	for ct, file := range itemsManga {
+		// Open save file
+		fileAlternativeImage := openCSVFileStream(dirMappings + "mdex2altimage.csv")
+		defer fileAlternativeImage.Close()
+		writerAlternativeImage := csv.NewWriter(fileAlternativeImage)
+		defer writerAlternativeImage.Flush()
 
-		// Skip if a directory
-		if file.IsDir() {
-			continue
+		// Loop through all manga and try to get their chapter information for each
+		start = time.Now()
+		countHaveImagesExternal := make(map[string]int)
+		countHaveImages := 0
+		for ct, file := range itemsManga {
+
+			// Skip if a directory
+			if file.IsDir() {
+				continue
+			}
+
+			// Load the json from file into our manga struct
+			manga := mangadex.MangaResponse{}
+			fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
+			err := json.Unmarshal(fileManga, &manga)
+			if err != nil {
+				fmt.Printf("MANGA LOAD ERROR: %v (file %s)\n", err, file.Name())
+				continue
+			}
+
+			// Get our url for this manga if we can
+			url := ""
+			if _, ok := manga.Data.Attributes.Links["kt"]; ok {
+				url = external.GetCoverKitsu(manga.Data.Attributes.Links["kt"])
+				countHaveImagesExternal["kt"]++
+			}
+			if _, ok := manga.Data.Attributes.Links["al"]; url == "" && ok {
+				url = external.GetCoverAniList(manga.Data.Attributes.Links["al"])
+				countHaveImagesExternal["al"]++
+			}
+			if _, ok := manga.Data.Attributes.Links["mal"]; url == "" && ok {
+				url = external.GetCoverMyAnimeList(manga.Data.Attributes.Links["mal"])
+				countHaveImagesExternal["mal"]++
+			}
+			if _, ok := manga.Data.Attributes.Links["mu"]; url == "" && ok {
+				url = external.GetCoverMangaUpdates(manga.Data.Attributes.Links["mu"])
+				countHaveImagesExternal["mu"]++
+			}
+			if _, ok := manga.Data.Attributes.Links["ap"]; url == "" && ok {
+				url = external.GetCoverAnimePlanet(manga.Data.Attributes.Links["ap"])
+				countHaveImagesExternal["ap"]++
+			}
+			if url != "" {
+				data := []string{manga.Data.Id, url}
+				writeToCSV(writerAlternativeImage, data)
+				countHaveImages++
+			}
+
+			// Debug
+			if ct%100 == 0 {
+				avgIterTime := float64(ct+1) / (1e-9 * float64(time.Since(start).Nanoseconds()))
+				fmt.Printf("%d/%d mangas loaded at %.2f manga/sec (%d have images)....\n",
+					ct, len(itemsManga), avgIterTime, countHaveImages)
+			}
+
 		}
 
-		// Load the json from file into our manga struct
-		manga := mangadex.MangaResponse{}
-		fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
-		err := json.Unmarshal(fileManga, &manga)
-		if err != nil {
-			fmt.Printf("MANGA LOAD ERROR: %v (file %s)\n", err, file.Name())
-			continue
+		// Print out the number of covers we found
+		fmt.Printf("done processing alternative images!\n")
+		for key, value := range countHaveImagesExternal {
+			fmt.Printf("\t %s had %d covers found\n", key, value)
 		}
 
-		// Get our url for this manga if we can
-		url := ""
-		if _, ok := manga.Data.Attributes.Links["kt"]; ok {
-			url = external.GetCoverKitsu(manga.Data.Attributes.Links["kt"])
-			countHaveImagesExternal["kt"]++
-		}
-		if _, ok := manga.Data.Attributes.Links["al"]; url == "" && ok {
-			url = external.GetCoverAniList(manga.Data.Attributes.Links["al"])
-			countHaveImagesExternal["al"]++
-		}
-		if _, ok := manga.Data.Attributes.Links["mal"]; url == "" && ok {
-			url = external.GetCoverMyAnimeList(manga.Data.Attributes.Links["mal"])
-			countHaveImagesExternal["mal"]++
-		}
-		if _, ok := manga.Data.Attributes.Links["mu"]; url == "" && ok {
-			url = external.GetCoverMangaUpdates(manga.Data.Attributes.Links["mu"])
-			countHaveImagesExternal["mu"]++
-		}
-		if _, ok := manga.Data.Attributes.Links["ap"]; url == "" && ok {
-			url = external.GetCoverAnimePlanet(manga.Data.Attributes.Links["ap"])
-			countHaveImagesExternal["ap"]++
-		}
-		if url != "" {
-			data := []string{manga.Data.Id, url}
-			writeToCSV(writerAlternativeImage, data)
-			countHaveImages++
-		}
-
-		// Debug
-		if ct%100 == 0 {
-			avgIterTime := float64(ct+1) / (1e-9 * float64(time.Since(start).Nanoseconds()))
-			fmt.Printf("%d/%d mangas loaded at %.2f manga/sec (%d have images)....\n",
-				ct, len(itemsManga), avgIterTime, countHaveImages)
-		}
-
-	}
-
-	// Print out the number of covers we found
-	fmt.Printf("done processing alternative images!\n")
-	for key, value := range countHaveImagesExternal {
-		fmt.Printf("\t %s had %d covers found\n", key, value)
 	}
 
 }

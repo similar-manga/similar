@@ -691,7 +691,13 @@ func (a *MangaApiService) GetMangaIdFeed(ctx context.Context, id string, localVa
 		localVarQueryParams.Add("order", parameterToString(localVarOptionals.Order.Value(), ""))
 	}
 	if localVarOptionals != nil && localVarOptionals.Includes.IsSet() {
-		localVarQueryParams.Add("includes", parameterToString(localVarOptionals.Includes.Value(), "multi"))
+		// todo: future self, can we make arrays be smarter?
+		// todo: had to convert this to properly set the array value...
+		includes := localVarOptionals.Includes.Value().([]string)
+		for _, include := range includes {
+			localVarQueryParams.Add("includes[]", parameterToString(include, ""))
+		}
+		//localVarQueryParams.Add("includes", parameterToString(localVarOptionals.Includes.Value(), "multi"))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{}

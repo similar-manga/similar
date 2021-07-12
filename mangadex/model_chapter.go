@@ -10,4 +10,20 @@
 package mangadex
 
 type Chapter struct {
+	Attributes struct {
+		Chapter            string   `json:"chapter"`
+		CreatedAt          string   `json:"createdAt"`
+		Data               []string `json:"data"`
+		DataSaver          []string `json:"dataSaver"`
+		Hash               string   `json:"hash"`
+		PublishAt          string   `json:"publishAt"`
+		Title              string   `json:"title"`
+		TranslatedLanguage string   `json:"translatedLanguage"`
+		UpdatedAt          string   `json:"updatedAt"`
+		Version            int64    `json:"version"`
+		Volume             string   `json:"volume"`
+	} `json:"attributes"`
+	ID   string `json:"id"`
+	Type string `json:"type"`
 }
+

@@ -27,9 +27,16 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 		}
 	}
 
+	// Default includes we should use!
+	optsIncludes := make([]string, 0)
+	optsIncludes = append(optsIncludes, "author")
+	optsIncludes = append(optsIncludes, "artist")
+	optsIncludes = append(optsIncludes, "cover_art")
+
 	// Specify our max limit and loop through the entire API to get all manga
 	currentLimit := int32(100)
 	maxOffset := int32(10000)
+	lastTimeApiCall := time.Now()
 	for currentOffset := int32(0); currentOffset < maxOffset; currentOffset += currentLimit {
 
 		// Perform our api search call to get the response
@@ -42,11 +49,24 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 		if rating != "" {
 			opts.ContentRating = optional.NewInterface(rating)
 		}
+		opts.Includes = optional.NewInterface(optsIncludes)
 		// robustly re-try a few times if we fail
 		mangaList := mangadex.MangaList{}
 		resp := &http.Response{}
 		err := errors.New("startup")
 		for retryCount := 0; retryCount <= 3 && err != nil; retryCount++ {
+
+			// Rate limit if we have not waited enough
+			minMilliBetween := int64(220)
+			timeSinceLast := time.Since(lastTimeApiCall)
+			if timeSinceLast.Milliseconds() < minMilliBetween {
+				milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
+				//fmt.Printf("\u001B[1;31mwaiting %d milliseconds\u001B[0m\n", milliToWait)
+				time.Sleep(time.Duration(1e6 * milliToWait))
+			}
+
+			// Api call to the mangadex api (5 req per second)
+			lastTimeApiCall = time.Now()
 			mangaList, resp, err = client.MangaApi.GetSearchManga(ctx, &opts)
 			if err != nil {
 				fmt.Printf("\u001B[1;31mMANGA ERROR: %v\u001B[0m\n", err)
@@ -61,7 +81,7 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 			if err == nil {
 				resp.Body.Close()
 			}
-			time.Sleep(250 * time.Millisecond)
+
 		}
 
 		// Debug print total for this tag
@@ -73,7 +93,9 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 				if tagId == "" {
 					fmt.Printf("EMPTY | ")
 				} else {
-					fmt.Printf("%s | ", (*tagId2Tag)[tagId].Data.Attributes.Name["en"])
+					tmpTag := (*tagId2Tag)[tagId]
+					tmpName := (*tmpTag.Data.Attributes).Name
+					fmt.Printf("%s | ", (*tmpName)["en"])
 				}
 			}
 			fmt.Printf("has %d total manga\n", mangaList.Total)
@@ -90,12 +112,12 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 		}
 
 		// Update our current limit
-		maxOffset = mangaList.Total
+		// NOTE: they have coded a hard max of 10k, thus don't use the reported one...
+		maxOffset = int32(math.Min(float64(maxOffset), float64(mangaList.Total)))
 		currentLimit = int32(math.Min(float64(currentLimit), float64(maxOffset-currentOffset)))
-		if currentOffset%200 == 0 || currentOffset+currentLimit >= maxOffset {
+		if currentOffset%500 == 0 || currentOffset+currentLimit >= maxOffset {
 			fmt.Printf("\t - %d/%d completed....\n", currentOffset, maxOffset)
 		}
-		time.Sleep(250 * time.Millisecond)
 
 	}
 
@@ -104,21 +126,16 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 func main() {
 
 	// Directory configuration
-	dirMangas := "../data/manga/"
-	dirChapters := "../data/chapter/"
-	fileTagList := "../data/taglist.json"
+	dirMangas := "../similar_data/manga/"
+	fileTagList := "../similar_data/taglist.json"
 	err := os.MkdirAll(dirMangas, os.ModePerm)
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-	err = os.MkdirAll(dirChapters, os.ModePerm)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 
 	// Create client
 	config := mangadex.NewConfiguration()
-	config.UserAgent = "similar-manga v2.0"
+	config.UserAgent = "similar-manga v2.1"
 	config.HTTPClient = &http.Client{
 		Timeout: 60 * time.Second,
 	}
@@ -176,7 +193,7 @@ func main() {
 		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating)
 	}
 	for _, tags := range tagIdListCombinations {
-		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "")
+		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "safe")
 	}
 	fmt.Printf("downloaded %d mangas in %s!!\n\n", len(mangasDownloaded), time.Since(start))
 

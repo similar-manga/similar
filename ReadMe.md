@@ -4,8 +4,8 @@ This repo has both the scraping and matching utilities to find mangas which are 
 to create a recommendation system outside MangaDex since there isn't one and thus allow for users to discover other
 content. Right now it is pretty rudimentary, but seems to give ok results most of the time. If you want to use it,
 please download [Neko](https://github.com/CarlosEsco/Neko) and enable recommendations inside the app or use
-the [Chrome Extension](https://chrome.google.com/webstore/detail/mangadex-similar-manga/ghjofcifjnbpgfjbbnbeeipjlhnmbefl)
-.
+the [Chrome Extension](https://chrome.google.com/webstore/detail/mangadex-similar-manga/ghjofcifjnbpgfjbbnbeeipjlhnmbefl).
+
 
 ## Setup / Dependencies
 
@@ -17,8 +17,10 @@ downloaded / scraped from mangadex to be able to perform similar manga identific
 go get golang.org/x/oauth2
 go get github.com/antihax/optional
 go get github.com/james-bowman/nlp
+go get github.com/caneroj1/stemmer
 go get github.com/PuerkitoBio/goquery
 ```
+
 
 ## Manga Links Data
 

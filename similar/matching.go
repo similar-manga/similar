@@ -2,6 +2,7 @@ package similar
 
 import (
 	"../mangadex"
+	"strings"
 )
 
 var OneWayTags = []mangadex.Tag{
@@ -9,7 +10,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "b11fda93-8f1d-4bef-b2ed-8803d3733170",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "4-Koma"},
+			Name:    &map[string]string{"en": "4-Koma"},
 			Version: 1,
 		},
 	},
@@ -17,7 +18,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "b13b2a48-c720-44a9-9c77-39c9979373fb",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Doujinshi"},
+			Name:    &map[string]string{"en": "Doujinshi"},
 			Version: 1,
 		},
 	},
@@ -25,7 +26,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "b29d6a3d-1569-4e7a-8caf-7557bc92cd5d",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Gore"},
+			Name:    &map[string]string{"en": "Gore"},
 			Version: 1,
 		},
 	},
@@ -33,7 +34,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "97893a4c-12af-4dac-b6be-0dffb353568e",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Sexual Violence"},
+			Name:    &map[string]string{"en": "Sexual Violence"},
 			Version: 1,
 		},
 	},
@@ -41,7 +42,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "5920b825-4181-4a17-beeb-9918b0ff7a30",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Boy's Love"},
+			Name:    &map[string]string{"en": "Boy's Love"},
 			Version: 1,
 		},
 	},
@@ -49,7 +50,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "a3c67850-4684-404e-9b7f-c69850ee5da6",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Girl's Love"},
+			Name:    &map[string]string{"en": "Girl's Love"},
 			Version: 1,
 		},
 	},
@@ -57,7 +58,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "acc803a4-c95a-4c22-86fc-eb6b582d82a2",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Wuxia"},
+			Name:    &map[string]string{"en": "Wuxia"},
 			Version: 1,
 		},
 	},
@@ -65,7 +66,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "2d1f5d56-a1e5-4d0d-a961-2193588b08ec",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Loli"},
+			Name:    &map[string]string{"en": "Loli"},
 			Version: 1,
 		},
 	},
@@ -73,7 +74,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "ddefd648-5140-4e5f-ba18-4eca4071d19b",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Shota"},
+			Name:    &map[string]string{"en": "Shota"},
 			Version: 1,
 		},
 	},
@@ -81,7 +82,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "5bd0e105-4481-44ca-b6e7-7544da56b1a3",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    map[string]string{"en": "Incest"},
+			Name:    &map[string]string{"en": "Incest"},
 			Version: 1,
 		},
 	},
@@ -132,6 +133,13 @@ func NotValidMatch(manga mangadex.MangaResponse, mangaOther mangadex.MangaRespon
 			}
 		}
 
+	}
+
+	// Small check for "promo" titles, don't match to promotional titles
+	title := strings.ToLower((*manga.Data.Attributes.Title)["en"])
+	titleOther := strings.ToLower((*mangaOther.Data.Attributes.Title)["en"])
+	if !strings.Contains(title, "(promo)") && strings.Contains(titleOther, "(promo)") {
+		return true
 	}
 
 	// Else this is a valid match we can use!
