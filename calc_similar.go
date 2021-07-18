@@ -26,7 +26,7 @@ func main() {
 	dirMangas := "../similar_data/manga/"
 	dirChaptersInfo := "../similar_data/chapter_info/"
 	dirSimilar := "../similar_data/similar/"
-	numSimToGet := 25
+	numSimToGet := 12
 	tagScoreRatio := 0.45
 	ignoreDescScoreUnder := 0.01
 	acceptDescScoreOver := 0.40
