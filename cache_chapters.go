@@ -111,7 +111,7 @@ func main() {
 			// Write chapter this for this manga to file
 			file, _ := json.MarshalIndent(chapterList, "", " ")
 			_ = ioutil.WriteFile(chapterFilePath, file, 0644)
-			countChaptersDownloaded += len(chapterList.Results)
+			countChaptersDownloaded += len(chapterList.Data)
 
 		}
 
@@ -124,11 +124,11 @@ func main() {
 		// Languages, and what scanlation groups have translated for this
 		chapterInfo := similar.ChapterInformation{}
 		chapterInfo.Id = manga.Data.Id
-		chapterInfo.NumChapters = len(chapterList.Results)
+		chapterInfo.NumChapters = len(chapterList.Data)
 		tempLanguages := map[string]bool{}
 		tempGroups := map[string]similar.ChapterGroup{}
-		for _, chapter := range chapterList.Results {
-			lang := chapter.Data.Attributes.TranslatedLanguage
+		for _, chapter := range chapterList.Data {
+			lang := chapter.Attributes.TranslatedLanguage
 			group := similar.ChapterGroup{Id: "unknown", Name: "unknown"}
 			for _, relation := range chapter.Relationships {
 				if relation.Type_ == "scanlation_group" {

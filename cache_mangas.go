@@ -12,12 +12,13 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
 func downloadMangasBySearching(dirMangas string, ctx context.Context, client *mangadex.APIClient,
-	tagId2Tag *map[string]mangadex.TagResponse,
-	mangasDownloaded *map[string]bool, tags []string, rating string) {
+	tagId2Tag *map[string]mangadex.Tag,
+	mangasDownloaded *map[string]bool, tags []string, rating string, createdAtSince string) {
 
 	// Cleaned tags (remove empty!)
 	optsTags := make([]string, 0)
@@ -32,6 +33,8 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 	optsIncludes = append(optsIncludes, "author")
 	optsIncludes = append(optsIncludes, "artist")
 	optsIncludes = append(optsIncludes, "cover_art")
+	optsOrder := map[string]string{}
+	optsOrder["createdAt"] = "asc"
 
 	// Specify our max limit and loop through the entire API to get all manga
 	currentLimit := int32(100)
@@ -43,11 +46,15 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 		opts := mangadex.MangaApiGetSearchMangaOpts{}
 		opts.Limit = optional.NewInt32(currentLimit)
 		opts.Offset = optional.NewInt32(currentOffset)
+		opts.Order = optional.NewInterface(optsOrder)
 		if len(optsTags) != 0 {
 			opts.IncludedTags = optional.NewInterface(optsTags)
 		}
 		if rating != "" {
 			opts.ContentRating = optional.NewInterface(rating)
+		}
+		if createdAtSince != "" {
+			opts.CreatedAtSince = optional.NewString(createdAtSince)
 		}
 		opts.Includes = optional.NewInterface(optsIncludes)
 		// robustly re-try a few times if we fail
@@ -94,20 +101,24 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 					fmt.Printf("EMPTY | ")
 				} else {
 					tmpTag := (*tagId2Tag)[tagId]
-					tmpName := (*tmpTag.Data.Attributes).Name
+					tmpName := (*tmpTag.Attributes).Name
 					fmt.Printf("%s | ", (*tmpName)["en"])
 				}
+			}
+			if createdAtSince != "" {
+				fmt.Printf("%s | \n", createdAtSince)
 			}
 			fmt.Printf("has %d total manga\n", mangaList.Total)
 		}
 
 		// Loop through all manga and print their ids
-		for _, manga := range mangaList.Results {
+		for _, manga := range mangaList.Data {
 			//fmt.Printf("%d/%d -> %s\n", currentOffset+int32(i), maxOffset, manga.Data.Id)
-			if !(*mangasDownloaded)[manga.Data.Id] {
+			//fmt.Printf("manga - %s \n", manga.Attributes.CreatedAt)
+			if !(*mangasDownloaded)[manga.Id] {
 				file, _ := json.MarshalIndent(manga, "", " ")
-				_ = ioutil.WriteFile(dirMangas+manga.Data.Id+".json", file, 0644)
-				(*mangasDownloaded)[manga.Data.Id] = true
+				_ = ioutil.WriteFile(dirMangas+manga.Id+".json", file, 0644)
+				(*mangasDownloaded)[manga.Id] = true
 			}
 		}
 
@@ -156,12 +167,12 @@ func main() {
 	// Generate unique combinations we will try for our tags
 	// This is to try to get as many mangas to be downloaded as possible
 	// Since the api only returns 10k max, we will use tags to try to get all
-	tagId2Tag := make(map[string]mangadex.TagResponse)
+	tagId2Tag := make(map[string]mangadex.Tag)
 	tagIdList := make([]string, 0)
-	for _, tag := range tagList {
-		if tag.Data != nil && tag.Data.Type_ == "tag" {
-			tagIdList = append(tagIdList, tag.Data.Id)
-			tagId2Tag[tag.Data.Id] = tag
+	for _, tag := range tagList.Data {
+		if tag.Attributes != nil && tag.Type_ == "tag" {
+			tagIdList = append(tagIdList, tag.Id)
+			tagId2Tag[tag.Id] = tag
 		}
 	}
 	tagIdList = append(tagIdList, "")
@@ -183,17 +194,23 @@ func main() {
 			}
 		}
 	}
-	contentRatingIdList := []string{"safe", "suggestive", "erotica", "pornographic"}
 	fmt.Printf("generated %d unique tag combinations from %d tags\n", len(tagIdListCombinations), len(tagIdList))
 
 	// Here we will loop through all tags
 	start := time.Now()
 	mangasDownloaded := make(map[string]bool)
+	contentRatingIdList := []string{"safe", "suggestive", "erotica", "pornographic"}
 	for _, rating := range contentRatingIdList {
-		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating)
+		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating, "")
 	}
 	for _, tags := range tagIdListCombinations {
-		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "safe")
+		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "safe", "")
+	}
+	for year := 2018; year <= 2021; year++ {
+		for month := 1; month <= 12; month++ {
+			createdAtSince := strconv.Itoa(year) + "-" + fmt.Sprintf("%02d", month) + "-01T00:00:00"
+			downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, "safe", createdAtSince)
+		}
 	}
 	fmt.Printf("downloaded %d mangas in %s!!\n\n", len(mangasDownloaded), time.Since(start))
 
