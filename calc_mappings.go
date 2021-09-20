@@ -104,7 +104,7 @@ func main() {
 		}
 
 		// Load the json from file into our manga struct
-		manga := mangadex.MangaResponse{}
+		manga := mangadex.Manga{}
 		fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
 		err := json.Unmarshal(fileManga, &manga)
 		if err != nil {
@@ -113,36 +113,36 @@ func main() {
 		}
 
 		// Our search file
-		data := []string{manga.Data.Id, (*manga.Data.Attributes.Title)["en"], manga.Data.Attributes.ContentRating}
+		data := []string{manga.Id, (*manga.Attributes.Title)["en"], manga.Attributes.ContentRating}
 		writeToCSV(writerSEARCH, data)
 
 		// Save the external mappings
-		if _, ok := manga.Data.Attributes.Links["al"]; ok {
-			data := []string{manga.Data.Attributes.Links["al"], manga.Data.Id}
+		if _, ok := manga.Attributes.Links["al"]; ok {
+			data := []string{manga.Attributes.Links["al"], manga.Id}
 			writeToCSV(writerAL, data)
 		}
-		if _, ok := manga.Data.Attributes.Links["ap"]; ok {
-			data := []string{manga.Data.Attributes.Links["ap"], manga.Data.Id}
+		if _, ok := manga.Attributes.Links["ap"]; ok {
+			data := []string{manga.Attributes.Links["ap"], manga.Id}
 			writeToCSV(writerAP, data)
 		}
-		if _, ok := manga.Data.Attributes.Links["bw"]; ok {
-			data := []string{manga.Data.Attributes.Links["bw"], manga.Data.Id}
+		if _, ok := manga.Attributes.Links["bw"]; ok {
+			data := []string{manga.Attributes.Links["bw"], manga.Id}
 			writeToCSV(writerBW, data)
 		}
-		if _, ok := manga.Data.Attributes.Links["mu"]; ok {
-			data := []string{manga.Data.Attributes.Links["mu"], manga.Data.Id}
+		if _, ok := manga.Attributes.Links["mu"]; ok {
+			data := []string{manga.Attributes.Links["mu"], manga.Id}
 			writeToCSV(writerMU, data)
 		}
-		if _, ok := manga.Data.Attributes.Links["nu"]; ok {
-			data := []string{manga.Data.Attributes.Links["nu"], manga.Data.Id}
+		if _, ok := manga.Attributes.Links["nu"]; ok {
+			data := []string{manga.Attributes.Links["nu"], manga.Id}
 			writeToCSV(writerNU, data)
 		}
-		if _, ok := manga.Data.Attributes.Links["kt"]; ok {
-			data := []string{manga.Data.Attributes.Links["kt"], manga.Data.Id}
+		if _, ok := manga.Attributes.Links["kt"]; ok {
+			data := []string{manga.Attributes.Links["kt"], manga.Id}
 			writeToCSV(writerKT, data)
 		}
-		if _, ok := manga.Data.Attributes.Links["mal"]; ok {
-			data := []string{manga.Data.Attributes.Links["mal"], manga.Data.Id}
+		if _, ok := manga.Attributes.Links["mal"]; ok {
+			data := []string{manga.Attributes.Links["mal"], manga.Id}
 			writeToCSV(writerMAL, data)
 		}
 
@@ -192,7 +192,7 @@ func main() {
 			}
 
 			// Load the json from file into our manga struct
-			manga := mangadex.MangaResponse{}
+			manga := mangadex.Manga{}
 			fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
 			err := json.Unmarshal(fileManga, &manga)
 			if err != nil {
@@ -202,28 +202,28 @@ func main() {
 
 			// Get our url for this manga if we can
 			url := ""
-			if _, ok := manga.Data.Attributes.Links["kt"]; ok {
-				url = external.GetCoverKitsu(manga.Data.Attributes.Links["kt"])
+			if _, ok := manga.Attributes.Links["kt"]; ok {
+				url = external.GetCoverKitsu(manga.Attributes.Links["kt"])
 				countHaveImagesExternal["kt"]++
 			}
-			if _, ok := manga.Data.Attributes.Links["al"]; url == "" && ok {
-				url = external.GetCoverAniList(manga.Data.Attributes.Links["al"])
+			if _, ok := manga.Attributes.Links["al"]; url == "" && ok {
+				url = external.GetCoverAniList(manga.Attributes.Links["al"])
 				countHaveImagesExternal["al"]++
 			}
-			if _, ok := manga.Data.Attributes.Links["mal"]; url == "" && ok {
-				url = external.GetCoverMyAnimeList(manga.Data.Attributes.Links["mal"])
+			if _, ok := manga.Attributes.Links["mal"]; url == "" && ok {
+				url = external.GetCoverMyAnimeList(manga.Attributes.Links["mal"])
 				countHaveImagesExternal["mal"]++
 			}
-			if _, ok := manga.Data.Attributes.Links["mu"]; url == "" && ok {
-				url = external.GetCoverMangaUpdates(manga.Data.Attributes.Links["mu"])
+			if _, ok := manga.Attributes.Links["mu"]; url == "" && ok {
+				url = external.GetCoverMangaUpdates(manga.Attributes.Links["mu"])
 				countHaveImagesExternal["mu"]++
 			}
-			if _, ok := manga.Data.Attributes.Links["ap"]; url == "" && ok {
-				url = external.GetCoverAnimePlanet(manga.Data.Attributes.Links["ap"])
+			if _, ok := manga.Attributes.Links["ap"]; url == "" && ok {
+				url = external.GetCoverAnimePlanet(manga.Attributes.Links["ap"])
 				countHaveImagesExternal["ap"]++
 			}
 			if url != "" {
-				data := []string{manga.Data.Id, url}
+				data := []string{manga.Id, url}
 				writeToCSV(writerAlternativeImage, data)
 				countHaveImages++
 			}

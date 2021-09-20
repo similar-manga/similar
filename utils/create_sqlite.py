@@ -1,10 +1,12 @@
 import os
 import csv
 import sqlite3
+from shutil import copyfile
 from collections import defaultdict
 
 # parameters
-basedir = "../../similar_data/mapping/"
+scriptdir = os.path.dirname(os.path.realpath(__file__))
+basedir = scriptdir + "/../../similar_data/mapping/"
 sqlitefile = basedir+"mappings.db"
 csvfiles = {
     "al" : basedir+"anilist2mdex.csv",
@@ -15,6 +17,8 @@ csvfiles = {
     "kt" : basedir+"kitsu2mdex.csv",
     "mal" : basedir+"myanimelist2mdex.csv",
 }
+print("write file:")
+print(sqlitefile)
 
 # remove db file if exists so we are fresh
 if os.path.exists(sqlitefile):
@@ -56,5 +60,12 @@ con.commit()
 # finally close the file
 con.close()
 
+# copy the file to my script directory
+sqlitefile_in_scriptdir = scriptdir+"/mappings.db"
+if os.path.exists(sqlitefile_in_scriptdir):
+  os.remove(sqlitefile_in_scriptdir)
+copyfile(sqlitefile, sqlitefile_in_scriptdir)
+print("copied file to:")
+print(sqlitefile_in_scriptdir)
 
 
