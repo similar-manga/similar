@@ -41,7 +41,7 @@ func main() {
 	corpusTag := []string{}
 	corpusDesc := []string{}
 	corpusDescLength := []int{}
-	mangas := []mangadex.MangaResponse{}
+	mangas := []mangadex.Manga{}
 	mangasChapterInfo := []similar.ChapterInformation{}
 	itemsManga, _ := ioutil.ReadDir(dirMangas)
 	for _, file := range itemsManga {
@@ -52,7 +52,7 @@ func main() {
 		}
 
 		// Load the json from file into our manga struct
-		manga := mangadex.MangaResponse{}
+		manga := mangadex.Manga{}
 		fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
 		err := json.Unmarshal(fileManga, &manga)
 		if err != nil {
@@ -70,21 +70,21 @@ func main() {
 		}
 
 		// Skip if invalid
-		if manga.Data.Attributes.Title == nil || manga.Data.Attributes.Description == nil {
+		if manga.Attributes.Title == nil || manga.Attributes.Description == nil {
 			continue
 		}
 
 		// Get the tag and description for this manga
 		tagText := ""
-		for _, tag := range manga.Data.Attributes.Tags {
+		for _, tag := range manga.Attributes.Tags {
 			if tag.Type_ != "tag" {
 				continue
 			}
 			reg, _ := regexp.Compile("[^a-zA-Z0-9]+")
 			tagText += reg.ReplaceAllString((*tag.Attributes.Name)["en"], "") + " "
 		}
-		descText := similar.CleanTitle((*manga.Data.Attributes.Title)["en"]) + " "
-		descText += similar.CleanDescription((*manga.Data.Attributes.Description)["en"])
+		descText := similar.CleanTitle((*manga.Attributes.Title)["en"]) + " "
+		descText += similar.CleanDescription((*manga.Attributes.Description)["en"])
 
 		// Append to the corpusDesc
 		corpusTag = append(corpusTag, tagText)
@@ -211,7 +211,7 @@ func main() {
 		// Debug check / skip mangas
 		//debugMangaIds := map[string]bool{"32d76d19-8a05-4db0-9fc2-e0b0648fe9d0": true, "d46d9573-2ad9-45b2-9b6d-45f95452d1c0": true,
 		//	"e78a489b-6632-4d61-b00b-5206f5b8b22b": true, "58bc83a0-1808-484e-88b9-17e167469e23": true, "0fa5dab2-250a-4f69-bd15-9ceea54176fa": true}
-		//if _, ok := debugMangaIds[manga.Data.Id]; !ok {
+		//if _, ok := debugMangaIds[manga.Id]; !ok {
 		//	continue
 		//}
 
@@ -266,11 +266,11 @@ func main() {
 
 		// Create our similar manga api object which will have our matches in it
 		similarMangaData := similar.SimilarManga{}
-		similarMangaData.Id = manga.Data.Id
-		similarMangaData.Title = *manga.Data.Attributes.Title
-		similarMangaData.ContentRating = manga.Data.Attributes.ContentRating
+		similarMangaData.Id = manga.Id
+		similarMangaData.Title = *manga.Attributes.Title
+		similarMangaData.ContentRating = manga.Attributes.ContentRating
 		similarMangaData.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05+00:00")
-		fmt.Printf("manga %d has %d tags -> %s - https://mangadex.org/title/%s\n", j, numTags, (*manga.Data.Attributes.Title)["en"], manga.Data.Id)
+		fmt.Printf("manga %d has %d tags -> %s - https://mangadex.org/title/%s\n", j, numTags, (*manga.Attributes.Title)["en"], manga.Id)
 
 		// Finally loop through all our matches and try to find the best ones!
 		for _, match := range matches {
@@ -321,11 +321,11 @@ func main() {
 
 			// Otherwise lets append it!
 			fmt.Printf("\t - matched to id %d (%.3f tag, %.3f desc, %.3f combined) -> %s - https://mangadex.org/title/%s\n",
-				id, match.DistanceTag, match.DistanceDesc, match.Distance, (*mangas[id].Data.Attributes.Title)["en"], mangas[id].Data.Id)
+				id, match.DistanceTag, match.DistanceDesc, match.Distance, (*mangas[id].Attributes.Title)["en"], mangas[id].Id)
 			matchData := similar.SimilarMatch{}
-			matchData.Id = mangas[id].Data.Id
-			matchData.Title = *mangas[id].Data.Attributes.Title
-			matchData.ContentRating = mangas[id].Data.Attributes.ContentRating
+			matchData.Id = mangas[id].Id
+			matchData.Title = *mangas[id].Attributes.Title
+			matchData.ContentRating = mangas[id].Attributes.ContentRating
 			matchData.Score = float32(match.Distance)
 			matchData.Languages = mangasChapterInfo[id].Languages
 			similarMangaData.SimilarMatches = append(similarMangaData.SimilarMatches, matchData)

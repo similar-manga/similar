@@ -22,11 +22,14 @@ func main() {
 	dirChapters := "../similar_data/chapter/"
 	dirChaptersInfo := "../similar_data/chapter_info/"
 	skipAlreadyDownloaded := true
-	err := os.MkdirAll(dirChapters, os.ModePerm)
-	if err != nil {
-		log.Fatalf("%v", err)
+	saveRawChapterList := false
+	if saveRawChapterList {
+		err := os.MkdirAll(dirChapters, os.ModePerm)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
 	}
-	err = os.MkdirAll(dirChaptersInfo, os.ModePerm)
+	err := os.MkdirAll(dirChaptersInfo, os.ModePerm)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -54,13 +57,14 @@ func main() {
 		}
 
 		// Load the json from file into our manga struct
-		manga := mangadex.MangaResponse{}
+		manga := mangadex.Manga{}
 		fileManga, _ := ioutil.ReadFile(dirMangas + file.Name())
 		_ = json.Unmarshal(fileManga, &manga)
 
 		// Either try to re-download or download if we don't have the chapter
-		chapterFilePath := dirChapters+manga.Data.Id+".json"
+		chapterFilePath := dirChapters+manga.Id+".json"
 		_, err := os.Stat(chapterFilePath)
+		chapterList := mangadex.ChapterList{}
 		if !skipAlreadyDownloaded || os.IsNotExist(err) {
 
 			// Default includes we should use!
@@ -75,7 +79,6 @@ func main() {
 			opts.Includes = optional.NewInterface(optsIncludes)
 
 			// Robustly re-try a few times if we fail
-			chapterList := mangadex.ChapterList{}
 			resp := &http.Response{}
 			err := errors.New("startup")
 			for retryCount := 0; retryCount <= 3 && err != nil; retryCount++ {
@@ -91,7 +94,7 @@ func main() {
 
 				// Api call to the mangadex api (5 req per second)
 				lastTimeApiCall = time.Now()
-				chapterList, resp, err = client.MangaApi.GetMangaIdFeed(ctx, manga.Data.Id, &opts)
+				chapterList, resp, err = client.MangaApi.GetMangaIdFeed(ctx, manga.Id, &opts)
 				if err != nil {
 					fmt.Printf("\u001B[1;31mCHAPTER ERROR: %v\u001B[0m\n", err)
 				} else if resp == nil {
@@ -109,21 +112,28 @@ func main() {
 			}
 
 			// Write chapter this for this manga to file
-			file, _ := json.MarshalIndent(chapterList, "", " ")
-			_ = ioutil.WriteFile(chapterFilePath, file, 0644)
+			if saveRawChapterList {
+				file, _ := json.MarshalIndent(chapterList, "", " ")
+				_ = ioutil.WriteFile(chapterFilePath, file, 0644)
+			}
 			countChaptersDownloaded += len(chapterList.Data)
 
+		} else {
+			// check that we have the chapter
+			if os.IsNotExist(err) {
+				fmt.Printf("%d/%d mangas -> manga chapters now downloaded!!!\n", ct+1)
+				continue
+			}
+			// Now lets open the file and do some computations
+			chapterList = mangadex.ChapterList{}
+			fileChapter, _ := ioutil.ReadFile(chapterFilePath)
+			_ = json.Unmarshal(fileChapter, &chapterList)
 		}
-
-		// Now lets open the file and do some computations
-		chapterList := mangadex.ChapterList{}
-		fileChapter, _ := ioutil.ReadFile(chapterFilePath)
-		_ = json.Unmarshal(fileChapter, &chapterList)
 
 		// Get compress "information" about this chapter such as the number of chapters
 		// Languages, and what scanlation groups have translated for this
 		chapterInfo := similar.ChapterInformation{}
-		chapterInfo.Id = manga.Data.Id
+		chapterInfo.Id = manga.Id
 		chapterInfo.NumChapters = len(chapterList.Data)
 		tempLanguages := map[string]bool{}
 		tempGroups := map[string]similar.ChapterGroup{}
@@ -153,7 +163,7 @@ func main() {
 		}
 
 		// Finally write the info to file
-		chapterInfoFilePath := dirChaptersInfo+manga.Data.Id+".json"
+		chapterInfoFilePath := dirChaptersInfo+manga.Id+".json"
 		file, _ := json.MarshalIndent(chapterInfo, "", " ")
 		_ = ioutil.WriteFile(chapterInfoFilePath, file, 0644)
 

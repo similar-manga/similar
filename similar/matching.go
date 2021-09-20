@@ -88,23 +88,23 @@ var OneWayTags = []mangadex.Tag{
 	},
 }
 
-func NotValidMatch(manga mangadex.MangaResponse, mangaOther mangadex.MangaResponse) bool {
+func NotValidMatch(manga mangadex.Manga, mangaOther mangadex.Manga) bool {
 
 	// Enforce that our two demographics are the same
-	if manga.Data.Attributes.ContentRating != "" &&
-		manga.Data.Attributes.ContentRating != mangaOther.Data.Attributes.ContentRating {
+	if manga.Attributes.ContentRating != "" &&
+		manga.Attributes.ContentRating != mangaOther.Attributes.ContentRating {
 		return true
 	}
 
 	// Enforce that our two demographics are the same
-	if manga.Data.Attributes.PublicationDemographic != "" &&
-		manga.Data.Attributes.PublicationDemographic != mangaOther.Data.Attributes.PublicationDemographic {
+	if manga.Attributes.PublicationDemographic != "" &&
+		manga.Attributes.PublicationDemographic != mangaOther.Attributes.PublicationDemographic {
 		return true
 	}
 
 	// No need to check tags for our top level content ratings
 	// They will be a valid match no matter the tags (not that many options thus can't limit)
-	if manga.Data.Attributes.ContentRating == "erotica" || manga.Data.Attributes.ContentRating == "pornographic" {
+	if manga.Attributes.ContentRating == "erotica" || manga.Attributes.ContentRating == "pornographic" {
 		return false
 	}
 
@@ -113,7 +113,7 @@ func NotValidMatch(manga mangadex.MangaResponse, mangaOther mangadex.MangaRespon
 
 		// Check to see if this tag is in our first manga
 		hasTag := false
-		for _, tag2 := range manga.Data.Attributes.Tags {
+		for _, tag2 := range manga.Attributes.Tags {
 			if tag2.Id == tag1.Id {
 				hasTag = true
 				break
@@ -127,7 +127,7 @@ func NotValidMatch(manga mangadex.MangaResponse, mangaOther mangadex.MangaRespon
 		}
 
 		// Check if other does not have the tag
-		for _, tag2 := range mangaOther.Data.Attributes.Tags {
+		for _, tag2 := range mangaOther.Attributes.Tags {
 			if tag2.Id == tag1.Id {
 				return true
 			}
@@ -136,8 +136,8 @@ func NotValidMatch(manga mangadex.MangaResponse, mangaOther mangadex.MangaRespon
 	}
 
 	// Small check for "promo" titles, don't match to promotional titles
-	title := strings.ToLower((*manga.Data.Attributes.Title)["en"])
-	titleOther := strings.ToLower((*mangaOther.Data.Attributes.Title)["en"])
+	title := strings.ToLower((*manga.Attributes.Title)["en"])
+	titleOther := strings.ToLower((*mangaOther.Attributes.Title)["en"])
 	if !strings.Contains(title, "(promo)") && strings.Contains(titleOther, "(promo)") {
 		return true
 	}
