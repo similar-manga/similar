@@ -10,7 +10,6 @@ import (
 	"unicode"
 )
 
-
 var reg00, _ = regexp.Compile(`\n?\r`)
 var reg01, _ = regexp.Compile(`\n`)
 var reg02, _ = regexp.Compile(`\[.*?]`)

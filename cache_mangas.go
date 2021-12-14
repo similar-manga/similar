@@ -1,12 +1,12 @@
 package main
 
 import (
-	"./mangadex"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/antihax/optional"
+	"github.com/similar-manga/similar/mangadex"
 	"io/ioutil"
 	"log"
 	"math"
@@ -137,8 +137,8 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 func main() {
 
 	// Directory configuration
-	dirMangas := "../similar_data/manga/"
-	fileTagList := "../similar_data/taglist.json"
+	dirMangas := "D:/MANGADEX/similar_data/manga/"
+	fileTagList := "D:/MANGADEX/similar_data/taglist.json"
 	err := os.MkdirAll(dirMangas, os.ModePerm)
 	if err != nil {
 		log.Fatalf("%v", err)
@@ -146,7 +146,7 @@ func main() {
 
 	// Create client
 	config := mangadex.NewConfiguration()
-	config.UserAgent = "similar-manga v2.1"
+	config.UserAgent = "similar-manga v2.2"
 	config.HTTPClient = &http.Client{
 		Timeout: 60 * time.Second,
 	}

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"./external"
-	"./mangadex"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"github.com/similar-manga/similar/external"
+	"github.com/similar-manga/similar/mangadex"
 	"io/ioutil"
 	"log"
 	"os"
@@ -30,8 +30,8 @@ func writeToCSV(writer *csv.Writer, data []string) {
 func main() {
 
 	// Directory configuration
-	dirMangas := "../similar_data/manga/"
-	dirMappings := "../similar_data/mapping/"
+	dirMangas := "D:/MANGADEX/similar_data/manga/"
+	dirMappings := "D:/MANGADEX/similar_data/mapping/"
 	updateAltCoverMapping := false
 	err := os.MkdirAll(dirMappings, os.ModePerm)
 	if err != nil {

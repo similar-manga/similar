@@ -1,14 +1,14 @@
 package main
 
 import (
-	"./mangadex"
-	"./similar"
 	"encoding/json"
 	"fmt"
 	"github.com/caneroj1/stemmer"
 	"github.com/james-bowman/nlp"
 	"github.com/james-bowman/nlp/measures/pairwise"
 	"github.com/james-bowman/sparse"
+	"github.com/similar-manga/similar/mangadex"
+	"github.com/similar-manga/similar/similar"
 	"gonum.org/v1/gonum/mat"
 	"io/ioutil"
 	"log"
@@ -23,9 +23,9 @@ import (
 func main() {
 
 	// Directory configuration
-	dirMangas := "../similar_data/manga/"
-	dirChaptersInfo := "../similar_data/chapter_info/"
-	dirSimilar := "../similar_data/similar/"
+	dirMangas := "D:/MANGADEX/similar_data/manga/"
+	dirChaptersInfo := "D:/MANGADEX/similar_data/chapter_info/"
+	dirSimilar := "D:/MANGADEX/similar_data/similar/"
 	numSimToGet := 12
 	tagScoreRatio := 0.45
 	ignoreDescScoreUnder := 0.01

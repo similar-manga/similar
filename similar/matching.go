@@ -1,7 +1,7 @@
 package similar
 
 import (
-	"../mangadex"
+	"github.com/similar-manga/similar/mangadex"
 	"strings"
 )
 
@@ -42,7 +42,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "5920b825-4181-4a17-beeb-9918b0ff7a30",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    &map[string]string{"en": "Boy's Love"},
+			Name:    &map[string]string{"en": "Boys' Love"},
 			Version: 1,
 		},
 	},
@@ -50,7 +50,7 @@ var OneWayTags = []mangadex.Tag{
 		Id:    "a3c67850-4684-404e-9b7f-c69850ee5da6",
 		Type_: "tag",
 		Attributes: &mangadex.TagAttributes{
-			Name:    &map[string]string{"en": "Girl's Love"},
+			Name:    &map[string]string{"en": "Girls' Love"},
 			Version: 1,
 		},
 	},

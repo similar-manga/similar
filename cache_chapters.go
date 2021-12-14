@@ -1,13 +1,13 @@
 package main
 
 import (
-	"./mangadex"
-	"./similar"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/antihax/optional"
+	"github.com/similar-manga/similar/mangadex"
+	"github.com/similar-manga/similar/similar"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,9 +18,9 @@ import (
 func main() {
 
 	// Directory configuration
-	dirMangas := "../similar_data/manga/"
-	dirChapters := "../similar_data/chapter/"
-	dirChaptersInfo := "../similar_data/chapter_info/"
+	dirMangas := "D:/MANGADEX/similar_data/manga/"
+	dirChapters := "D:/MANGADEX/similar_data/chapter/"
+	dirChaptersInfo := "D:/MANGADEX/similar_data/chapter_info/"
 	skipAlreadyDownloaded := true
 	saveRawChapterList := false
 	if saveRawChapterList {
@@ -36,7 +36,7 @@ func main() {
 
 	// Create client
 	config := mangadex.NewConfiguration()
-	config.UserAgent = "similar-manga v2.0"
+	config.UserAgent = "similar-manga v2.2"
 	config.HTTPClient = &http.Client{
 		Timeout: 60 * time.Second,
 	}
@@ -62,7 +62,7 @@ func main() {
 		_ = json.Unmarshal(fileManga, &manga)
 
 		// Either try to re-download or download if we don't have the chapter
-		chapterFilePath := dirChapters+manga.Id+".json"
+		chapterFilePath := dirChapters + manga.Id + ".json"
 		_, err := os.Stat(chapterFilePath)
 		chapterList := mangadex.ChapterList{}
 		if !skipAlreadyDownloaded || os.IsNotExist(err) {
@@ -141,7 +141,7 @@ func main() {
 			lang := chapter.Attributes.TranslatedLanguage
 			group := similar.ChapterGroup{Id: "unknown", Name: "unknown"}
 			for _, relation := range chapter.Relationships {
-				if relation.Type_ == "scanlation_group" {
+				if relation.Type_ == "scanlation_group" && relation.Attributes != nil {
 					attributes := (*relation.Attributes).(map[string]interface{})
 					group = similar.ChapterGroup{Id: relation.Id, Name: attributes["name"].(string)}
 					break
@@ -155,7 +155,7 @@ func main() {
 				tempGroups[group.Id] = group
 			}
 		}
-		for k, _ := range tempLanguages {
+		for k := range tempLanguages {
 			chapterInfo.Languages = append(chapterInfo.Languages, k)
 		}
 		for _, v := range tempGroups {
@@ -163,7 +163,7 @@ func main() {
 		}
 
 		// Finally write the info to file
-		chapterInfoFilePath := dirChaptersInfo+manga.Id+".json"
+		chapterInfoFilePath := dirChaptersInfo + manga.Id + ".json"
 		file, _ := json.MarshalIndent(chapterInfo, "", " ")
 		_ = ioutil.WriteFile(chapterInfoFilePath, file, 0644)
 

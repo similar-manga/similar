@@ -21,6 +21,15 @@ go get github.com/caneroj1/stemmer
 go get github.com/PuerkitoBio/goquery
 ```
 
+## Runtime Instructions
+
+
+1. Run `./cache_mangas` to get local list of all mangas on the site
+2. Run `./cache_chapters` to download number of chapters available and in what language for each manga
+3. Run `./calc_similar` to generate similarity index between manga
+4. Run `./calc_mappings` to export external ID to mangadex UUID mapping files
+5. Run `python utils/create_sqlite.py` to generate mapping file for [Neko](https://github.com/CarlosEsco/Neko/tree/master/app/src/main/assets)
+
 
 ## Manga Links Data
 
