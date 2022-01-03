@@ -321,15 +321,20 @@ func main() {
 			}
 
 			// Otherwise lets append it!
-			fmt.Printf("\t - matched to id %d (%.3f tag, %.3f desc, %.3f combined) -> %s - https://mangadex.org/title/%s\n",
-				id, match.DistanceTag, match.DistanceDesc, match.Distance, (*mangas[id].Attributes.Title)["en"], mangas[id].Id)
 			matchData := similar.SimilarMatch{}
 			matchData.Id = mangas[id].Id
 			matchData.Title = *mangas[id].Attributes.Title
 			matchData.ContentRating = mangas[id].Attributes.ContentRating
-			matchData.Score = float32(match.Distance)
+			matchData.Score = float32(match.Distance) / float32(tagScoreRatio + 1.0)
 			matchData.Languages = mangasChapterInfo[id].Languages
 			similarMangaData.SimilarMatches = append(similarMangaData.SimilarMatches, matchData)
+			fmt.Printf("\t - matched to id %d (%.3f tag, %.3f desc, %.3f combined) -> %s - https://mangadex.org/title/%s\n",
+				id, match.DistanceTag, match.DistanceDesc, matchData.Score, (*mangas[id].Attributes.Title)["en"], mangas[id].Id)
+
+			// Debug error if score is invalid
+			if matchData.Score > 1 || matchData.Score < 0 {
+				log.Fatalf("\u001B[1;31mINVALID SCORE: %s -> %s gave %.4f\u001B[0m\n", similarMangaData.Id, mangas[id].Id, matchData.Score)
+			}
 
 			// Exit if we have found enough similar manga!
 			if len(similarMangaData.SimilarMatches) >= numSimToGet {
