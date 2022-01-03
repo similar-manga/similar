@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import csv
 import sqlite3
@@ -6,7 +9,8 @@ from collections import defaultdict
 
 # parameters
 scriptdir = os.path.dirname(os.path.realpath(__file__))
-basedir = scriptdir + "/../../similar_data/mapping/"
+# basedir = scriptdir + "/../../similar_data/mapping/"
+basedir = "D:/MANGADEX/similar_data/mapping/"
 sqlitefile = basedir+"mappings.db"
 csvfiles = {
     "al" : basedir+"anilist2mdex.csv",
@@ -22,6 +26,7 @@ print(sqlitefile)
 
 # remove db file if exists so we are fresh
 if os.path.exists(sqlitefile):
+  print("removing old file....")
   os.remove(sqlitefile)
 
 # open the connection to file
