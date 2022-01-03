@@ -90,24 +90,6 @@ var OneWayTags = []mangadex.Tag{
 
 func NotValidMatch(manga mangadex.Manga, mangaOther mangadex.Manga) bool {
 
-	// Enforce that our two demographics are the same
-	if manga.Attributes.ContentRating != "" &&
-		manga.Attributes.ContentRating != mangaOther.Attributes.ContentRating {
-		return true
-	}
-
-	// Enforce that our two demographics are the same
-	if manga.Attributes.PublicationDemographic != "" &&
-		manga.Attributes.PublicationDemographic != mangaOther.Attributes.PublicationDemographic {
-		return true
-	}
-
-	// No need to check tags for our top level content ratings
-	// They will be a valid match no matter the tags (not that many options thus can't limit)
-	if manga.Attributes.ContentRating == "erotica" || manga.Attributes.ContentRating == "pornographic" {
-		return false
-	}
-
 	// Enforce that the two do not have another as a *related* manga
 	// A related manga is a sidestory / sequal / prequel for the work
 	related := map[string]bool{}
@@ -123,12 +105,36 @@ func NotValidMatch(manga mangadex.Manga, mangaOther mangadex.Manga) bool {
 		}
 	}
 	if _, found := related[mangaOther.Id]; found {
-		return false
+		return true
 	}
 	if _, found := relatedOther[manga.Id]; found {
-		return false
+		return true
 	}
 
+	// Enforce that our two demographics are the same
+	if manga.Attributes.ContentRating != "" &&
+		manga.Attributes.ContentRating != mangaOther.Attributes.ContentRating {
+		return true
+	}
+
+	// Small check for "promo" titles, don't match to promotional titles
+	title := strings.ToLower((*manga.Attributes.Title)["en"])
+	titleOther := strings.ToLower((*mangaOther.Attributes.Title)["en"])
+	if !strings.Contains(title, "(promo)") && strings.Contains(titleOther, "(promo)") {
+		return true
+	}
+
+	// Enforce that our two demographics are the same
+	if manga.Attributes.PublicationDemographic != "" &&
+		manga.Attributes.PublicationDemographic != mangaOther.Attributes.PublicationDemographic {
+		return true
+	}
+
+	// No need to check tags for our top level content ratings
+	// They will be a valid match no matter the tags (not that many options thus can't limit)
+	if manga.Attributes.ContentRating == "erotica" || manga.Attributes.ContentRating == "pornographic" {
+		return false
+	}
 
 	// Next we should enforce the following tags
 	for _, tag1 := range OneWayTags {
@@ -155,13 +161,6 @@ func NotValidMatch(manga mangadex.Manga, mangaOther mangadex.Manga) bool {
 			}
 		}
 
-	}
-
-	// Small check for "promo" titles, don't match to promotional titles
-	title := strings.ToLower((*manga.Attributes.Title)["en"])
-	titleOther := strings.ToLower((*mangaOther.Attributes.Title)["en"])
-	if !strings.Contains(title, "(promo)") && strings.Contains(titleOther, "(promo)") {
-		return true
 	}
 
 	// Else this is a valid match we can use!
