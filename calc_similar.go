@@ -315,6 +315,7 @@ func main() {
 			}
 
 			// Tags / content ratings / demographics we enforce
+			// Also enforce that the manga can't be *related* to the match
 			if similar.NotValidMatch(manga, mangas[id]) {
 				continue
 			}

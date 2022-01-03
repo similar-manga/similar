@@ -108,6 +108,28 @@ func NotValidMatch(manga mangadex.Manga, mangaOther mangadex.Manga) bool {
 		return false
 	}
 
+	// Enforce that the two do not have another as a *related* manga
+	// A related manga is a sidestory / sequal / prequel for the work
+	related := map[string]bool{}
+	relatedOther := map[string]bool{}
+	for _, relation := range manga.Relationships {
+		if relation.Type_ == "manga" {
+			related[relation.Id] = true
+		}
+	}
+	for _, relation := range mangaOther.Relationships {
+		if relation.Type_ == "manga" {
+			relatedOther[relation.Id] = true
+		}
+	}
+	if _, found := related[mangaOther.Id]; found {
+		return false
+	}
+	if _, found := relatedOther[manga.Id]; found {
+		return false
+	}
+
+
 	// Next we should enforce the following tags
 	for _, tag1 := range OneWayTags {
 
