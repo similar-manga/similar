@@ -33,8 +33,6 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 	optsIncludes = append(optsIncludes, "author")
 	optsIncludes = append(optsIncludes, "artist")
 	optsIncludes = append(optsIncludes, "cover_art")
-	optsOrder := map[string]string{}
-	optsOrder["createdAt"] = "asc"
 
 	// Specify our max limit and loop through the entire API to get all manga
 	currentLimit := int32(100)
@@ -46,7 +44,7 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 		opts := mangadex.MangaApiGetSearchMangaOpts{}
 		opts.Limit = optional.NewInt32(currentLimit)
 		opts.Offset = optional.NewInt32(currentOffset)
-		opts.Order = optional.NewInterface(optsOrder)
+		opts.OrderCreatedAt = optional.NewString("asc")
 		if len(optsTags) != 0 {
 			opts.IncludedTags = optional.NewInterface(optsTags)
 		}
@@ -57,6 +55,7 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 			opts.CreatedAtSince = optional.NewString(createdAtSince)
 		}
 		opts.Includes = optional.NewInterface(optsIncludes)
+
 		// robustly re-try a few times if we fail
 		mangaList := mangadex.MangaList{}
 		resp := &http.Response{}
@@ -137,12 +136,27 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 func main() {
 
 	// Directory configuration
-	dirMangas := "D:/MANGADEX/similar_data/manga/"
-	fileTagList := "D:/MANGADEX/similar_data/taglist.json"
+	// Algorithm number:
+	// 		-1 - try to query all mangas
+	// 		0-45: select which query to perform
+	dirData := "D:/MANGADEX/similar_data/"
+	algoNum := -1
+	if len(os.Args) == 2 {
+		dirData = os.Args[1]
+	}
+	if len(os.Args) == 3 {
+		dirData = os.Args[1]
+		algoNum, _ = strconv.Atoi(os.Args[2])
+	}
+	dirMangas := dirData + "manga/"
+	fileTagList := dirData + "taglist.json"
 	err := os.MkdirAll(dirMangas, os.ModePerm)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
+	fmt.Printf("directory %s\n", dirData)
+	fmt.Printf("  - mangas %s\n", dirMangas)
+	fmt.Printf("  - tags %s\n", fileTagList)
 
 	// Create client
 	config := mangadex.NewConfiguration()
@@ -198,20 +212,33 @@ func main() {
 
 	// Here we will loop through all tags
 	start := time.Now()
+	algoCurr := 1
 	mangasDownloaded := make(map[string]bool)
 	contentRatingIdList := []string{"safe", "suggestive", "erotica", "pornographic"}
-	for _, rating := range contentRatingIdList {
-		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating, "")
-	}
-	for _, tags := range tagIdListCombinations {
-		downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "safe", "")
-	}
-	for year := 2018; year <= 2021; year++ {
-		for month := 1; month <= 12; month++ {
-			createdAtSince := strconv.Itoa(year) + "-" + fmt.Sprintf("%02d", month) + "-01T00:00:00"
-			downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, "safe", createdAtSince)
+	if algoNum == -1 || algoNum == 1 {
+		for _, rating := range contentRatingIdList {
+			downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, rating, "")
 		}
 	}
+	algoCurr++
+	for ct, tags := range tagIdListCombinations {
+		if algoNum == -1 || algoNum == algoCurr {
+			downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, tags, "safe", "")
+		}
+		if (ct+1)%len(tagIdList) == 0 {
+			algoCurr++
+		}
+	}
+	for year := 2018; year <= 2022; year++ {
+		if algoNum == -1 || algoNum == algoCurr {
+			for month := 1; month <= 12; month++ {
+				createdAtSince := strconv.Itoa(year) + "-" + fmt.Sprintf("%02d", month) + "-01T00:00:00"
+				downloadMangasBySearching(dirMangas, ctx, client, &tagId2Tag, &mangasDownloaded, []string{}, "safe", createdAtSince)
+			}
+		}
+		algoCurr++
+	}
+	fmt.Printf("processed of %d call of %d total\n", algoNum, algoCurr)
 	fmt.Printf("downloaded %d mangas in %s!!\n\n", len(mangasDownloaded), time.Since(start))
 
 }

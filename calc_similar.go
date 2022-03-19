@@ -16,6 +16,7 @@ import (
 	"os"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -23,9 +24,28 @@ import (
 func main() {
 
 	// Directory configuration
-	dirMangas := "D:/MANGADEX/similar_data/manga/"
-	dirChaptersInfo := "D:/MANGADEX/similar_data/chapter_info/"
-	dirSimilar := "D:/MANGADEX/similar_data/similar/"
+	// 39147 mangas in total as of 03-19-2022
+	dirData := "D:/MANGADEX/similar_data/"
+	algoNumMin := -1
+	algoNumMax := -1
+	if len(os.Args) == 2 {
+		dirData = os.Args[1]
+	}
+	if len(os.Args) == 4 {
+		dirData = os.Args[1]
+		algoNumMin, _ = strconv.Atoi(os.Args[2])
+		algoNumMax, _ = strconv.Atoi(os.Args[3])
+	}
+	dirMangas := dirData + "manga/"
+	dirChaptersInfo := dirData + "chapter_info/"
+	dirSimilar := dirData + "similar/"
+
+	// Check that we have valid range
+	if algoNumMin != -1 && algoNumMin >= algoNumMax {
+		log.Fatalf("invalid range of %d to %d\n", algoNumMin, algoNumMax)
+	}
+
+	// Settings
 	numSimToGet := 12
 	tagScoreRatio := 0.45
 	ignoreDescScoreUnder := 0.01
@@ -38,13 +58,20 @@ func main() {
 	}
 
 	// Loop through all manga and try to get their chapter information for each
+	countMangasProcessed := 0
+	startProcessing := time.Now()
 	corpusTag := []string{}
 	corpusDesc := []string{}
 	corpusDescLength := []int{}
 	mangas := []mangadex.Manga{}
 	mangasChapterInfo := []similar.ChapterInformation{}
 	itemsManga, _ := ioutil.ReadDir(dirMangas)
-	for _, file := range itemsManga {
+	for ct, file := range itemsManga {
+
+		// If we are only updating a range, then skip mangas
+		if ct != -1 && (ct < algoNumMin || ct >= algoNumMax) {
+			continue
+		}
 
 		// Skip if a directory
 		if file.IsDir() {
@@ -348,9 +375,11 @@ func main() {
 			file, _ := json.MarshalIndent(similarMangaData, "", " ")
 			_ = ioutil.WriteFile(dirSimilar+similarMangaData.Id+".json", file, 0644)
 		}
+		countMangasProcessed++
 		avgIterTime := float64(j+1) / time.Since(start).Seconds()
 		fmt.Printf("%d/%d processed at %.2f manga/sec....\n\n", j+1, len(mangas), avgIterTime)
 
 	}
+	fmt.Printf("calculated simularity for %d mangas in %s!!\n\n", countMangasProcessed, time.Since(startProcessing))
 
 }

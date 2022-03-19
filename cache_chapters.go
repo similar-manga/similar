@@ -12,15 +12,35 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
 func main() {
 
 	// Directory configuration
-	dirMangas := "D:/MANGADEX/similar_data/manga/"
-	dirChapters := "D:/MANGADEX/similar_data/chapter/"
-	dirChaptersInfo := "D:/MANGADEX/similar_data/chapter_info/"
+	// 39147 mangas in total as of 03-19-2022
+	dirData := "D:/MANGADEX/similar_data/"
+	algoNumMin := -1
+	algoNumMax := -1
+	if len(os.Args) == 2 {
+		dirData = os.Args[1]
+	}
+	if len(os.Args) == 4 {
+		dirData = os.Args[1]
+		algoNumMin, _ = strconv.Atoi(os.Args[2])
+		algoNumMax, _ = strconv.Atoi(os.Args[3])
+	}
+	dirMangas := dirData + "manga/"
+	dirChapters := dirData + "chapter/"
+	dirChaptersInfo := dirData + "chapter_info/"
+
+	// Check that we have valid range
+	if algoNumMin != -1 && algoNumMin >= algoNumMax {
+		log.Fatalf("invalid range of %d to %d\n", algoNumMin, algoNumMax)
+	}
+
+	// Settings
 	skipAlreadyDownloaded := true
 	saveRawChapterList := false
 	if saveRawChapterList {
@@ -44,12 +64,18 @@ func main() {
 	ctx := context.Background()
 
 	// Loop through all manga and try to get their chapter information for each
+	countMangasDownloaded := 0
 	countChaptersDownloaded := 0
 	start := time.Now()
 	itemsManga, _ := ioutil.ReadDir(dirMangas)
 	lastTimeApiCall := time.Now()
 	fmt.Printf("starting download of chapters for %d mangas\n", len(itemsManga))
 	for ct, file := range itemsManga {
+
+		// If we are only updating a range, then skip mangas
+		if ct != -1 && (ct < algoNumMin || ct >= algoNumMax) {
+			continue
+		}
 
 		// Skip if a directory
 		if file.IsDir() {
@@ -170,10 +196,15 @@ func main() {
 		// Debug print
 		if (ct+1)%200 == 0 {
 			avgIterTime := float64(ct+1) / time.Since(start).Seconds()
-			fmt.Printf("%d/%d mangas -> %d chapter downloaded at %.2f manga/sec....\n", ct+1, len(itemsManga), countChaptersDownloaded, avgIterTime)
+			totalMangas := len(itemsManga)
+			if algoNumMin != -1 {
+				totalMangas = algoNumMax - algoNumMin
+			}
+			fmt.Printf("%d/%d mangas -> %d chapter downloaded at %.2f manga/sec....\n", ct+1, totalMangas, countChaptersDownloaded, avgIterTime)
 		}
+		countMangasDownloaded++
 
 	}
-	fmt.Printf("downloaded %d chapters in %s!!\n\n", countChaptersDownloaded, time.Since(start))
+	fmt.Printf("downloaded %d chapters from %d mangas in %s!!\n\n", countChaptersDownloaded, countMangasDownloaded, time.Since(start))
 
 }
