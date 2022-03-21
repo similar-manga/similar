@@ -69,7 +69,7 @@ func main() {
 	for ct, file := range itemsManga {
 
 		// If we are only updating a range, then skip mangas
-		if ct != -1 && (ct < algoNumMin || ct >= algoNumMax) {
+		if algoNumMin != -1 && (ct < algoNumMin || ct >= algoNumMax) {
 			continue
 		}
 
