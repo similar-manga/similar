@@ -12,21 +12,6 @@ import (
 	"time"
 )
 
-func openCSVFileStream(path string) *os.File {
-	file, err := os.Create(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return file
-}
-
-func writeToCSV(writer *csv.Writer, data []string) {
-	err := writer.Write(data)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func main() {
 
 	// Directory configuration
@@ -39,56 +24,56 @@ func main() {
 	}
 
 	// id, title, and content rating (for cache searching)
-	fileSEARCH := openCSVFileStream(dirMappings + "mdex2search.csv")
+	fileSEARCH := external.OpenCSVFileStream(dirMappings + "mdex2search.csv")
 	defer fileSEARCH.Close()
 	writerSEARCH := csv.NewWriter(fileSEARCH)
 	defer writerSEARCH.Flush()
 
 	// anilist
 	// https://anilist.co/manga/`{id}`
-	fileAL := openCSVFileStream(dirMappings + "anilist2mdex.csv")
+	fileAL := external.OpenCSVFileStream(dirMappings + "anilist2mdex.csv")
 	defer fileAL.Close()
 	writerAL := csv.NewWriter(fileAL)
 	defer writerAL.Flush()
 
 	// animeplanet
 	// https://www.anime-planet.com/manga/`{slug}`
-	fileAP := openCSVFileStream(dirMappings + "animeplanet2mdex.csv")
+	fileAP := external.OpenCSVFileStream(dirMappings + "animeplanet2mdex.csv")
 	defer fileAP.Close()
 	writerAP := csv.NewWriter(fileAP)
 	defer writerAP.Flush()
 
 	// bookwalker.jp
 	// https://bookwalker.jp/`{slug}`
-	fileBW := openCSVFileStream(dirMappings + "bookwalker2mdex.csv")
+	fileBW := external.OpenCSVFileStream(dirMappings + "bookwalker2mdex.csv")
 	defer fileBW.Close()
 	writerBW := csv.NewWriter(fileBW)
 	defer writerBW.Flush()
 
 	// mangaupdates
 	// https://www.mangaupdates.com/series.html?id=`{id}`
-	fileMU := openCSVFileStream(dirMappings + "mangaupdates2mdex.csv")
+	fileMU := external.OpenCSVFileStream(dirMappings + "mangaupdates2mdex.csv")
 	defer fileMU.Close()
 	writerMU := csv.NewWriter(fileMU)
 	defer writerMU.Flush()
 
 	// novelupdates
 	// https://www.novelupdates.com/series/`{slug}`
-	fileNU := openCSVFileStream(dirMappings + "novelupdates2mdex.csv")
+	fileNU := external.OpenCSVFileStream(dirMappings + "novelupdates2mdex.csv")
 	defer fileNU.Close()
 	writerNU := csv.NewWriter(fileNU)
 	defer writerNU.Flush()
 
 	// kitsu.io
 	// https://kitsu.io/api/edge/manga?filter[slug]={slug}
-	fileKT := openCSVFileStream(dirMappings + "kitsu2mdex.csv")
+	fileKT := external.OpenCSVFileStream(dirMappings + "kitsu2mdex.csv")
 	defer fileKT.Close()
 	writerKT := csv.NewWriter(fileKT)
 	defer writerKT.Flush()
 
 	// myanimelist
 	// https://myanimelist.net/manga/{id}
-	fileMAL := openCSVFileStream(dirMappings + "myanimelist2mdex.csv")
+	fileMAL := external.OpenCSVFileStream(dirMappings + "myanimelist2mdex.csv")
 	defer fileMAL.Close()
 	writerMAL := csv.NewWriter(fileMAL)
 	defer writerMAL.Flush()
@@ -114,36 +99,36 @@ func main() {
 
 		// Our search file
 		data := []string{manga.Id, (*manga.Attributes.Title)["en"], manga.Attributes.ContentRating}
-		writeToCSV(writerSEARCH, data)
+		external.WriteToCSV(writerSEARCH, data)
 
 		// Save the external mappings
 		if _, ok := manga.Attributes.Links["al"]; ok {
 			data := []string{manga.Attributes.Links["al"], manga.Id}
-			writeToCSV(writerAL, data)
+			external.WriteToCSV(writerAL, data)
 		}
 		if _, ok := manga.Attributes.Links["ap"]; ok {
 			data := []string{manga.Attributes.Links["ap"], manga.Id}
-			writeToCSV(writerAP, data)
+			external.WriteToCSV(writerAP, data)
 		}
 		if _, ok := manga.Attributes.Links["bw"]; ok {
 			data := []string{manga.Attributes.Links["bw"], manga.Id}
-			writeToCSV(writerBW, data)
+			external.WriteToCSV(writerBW, data)
 		}
 		if _, ok := manga.Attributes.Links["mu"]; ok {
 			data := []string{manga.Attributes.Links["mu"], manga.Id}
-			writeToCSV(writerMU, data)
+			external.WriteToCSV(writerMU, data)
 		}
 		if _, ok := manga.Attributes.Links["nu"]; ok {
 			data := []string{manga.Attributes.Links["nu"], manga.Id}
-			writeToCSV(writerNU, data)
+			external.WriteToCSV(writerNU, data)
 		}
 		if _, ok := manga.Attributes.Links["kt"]; ok {
 			data := []string{manga.Attributes.Links["kt"], manga.Id}
-			writeToCSV(writerKT, data)
+			external.WriteToCSV(writerKT, data)
 		}
 		if _, ok := manga.Attributes.Links["mal"]; ok {
 			data := []string{manga.Attributes.Links["mal"], manga.Id}
-			writeToCSV(writerMAL, data)
+			external.WriteToCSV(writerMAL, data)
 		}
 
 		// Debug
@@ -153,7 +138,7 @@ func main() {
 		}
 
 	}
-	fmt.Printf("done processing mappings!\n")
+	fmt.Printf("done processing mappings (%.2f seconds)!\n", time.Since(start).Seconds())
 	writerSEARCH.Flush()
 	writerAL.Flush()
 	writerAP.Flush()
@@ -175,7 +160,7 @@ func main() {
 	if updateAltCoverMapping {
 
 		// Open save file
-		fileAlternativeImage := openCSVFileStream(dirMappings + "mdex2altimage.csv")
+		fileAlternativeImage := external.OpenCSVFileStream(dirMappings + "mdex2altimage.csv")
 		defer fileAlternativeImage.Close()
 		writerAlternativeImage := csv.NewWriter(fileAlternativeImage)
 		defer writerAlternativeImage.Flush()
@@ -224,7 +209,7 @@ func main() {
 			}
 			if url != "" {
 				data := []string{manga.Id, url}
-				writeToCSV(writerAlternativeImage, data)
+				external.WriteToCSV(writerAlternativeImage, data)
 				countHaveImages++
 			}
 
