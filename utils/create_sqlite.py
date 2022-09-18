@@ -17,6 +17,7 @@ csvfiles = {
     "ap" : basedir+"animeplanet2mdex.csv",
     "bw" : basedir+"bookwalker2mdex.csv",
     "mu" : basedir+"mangaupdates2mdex.csv",
+    "mu_new" : basedir+"mangaupdates_new2mdex.csv",
     "nu" : basedir+"novelupdates2mdex.csv",
     "kt" : basedir+"kitsu2mdex.csv",
     "mal" : basedir+"myanimelist2mdex.csv",
@@ -46,7 +47,7 @@ cur = con.cursor()
 
 
 # collect all manga into a large "mapping"
-cur.execute("CREATE TABLE IF NOT EXISTS mappings (mdex, al, ap, bw, mu, nu, kt, mal);")
+cur.execute("CREATE TABLE IF NOT EXISTS mappings (mdex, al, ap, bw, mu, mu_new, nu, kt, mal);")
 mangas = defaultdict(lambda: None)
 for table in csvfiles:
     with open(csvfiles[table], 'r', encoding="utf8", errors='replace') as fin:
@@ -56,8 +57,8 @@ for table in csvfiles:
                 mangas[i['idMdex']] = defaultdict(lambda: None)
             mangas[i['idMdex']][table] = i['idExt']
 # finally write to database
-to_db = [(i, mangas[i]["al"], mangas[i]["ap"], mangas[i]["bw"], mangas[i]["mu"], mangas[i]["nu"], mangas[i]["kt"], mangas[i]["mal"]) for i in mangas]
-cur.executemany("INSERT INTO mappings (mdex, al, ap, bw, mu, nu, kt, mal) VALUES (?, ?, ?, ?, ?, ?, ?, ?);", to_db)
+to_db = [(i, mangas[i]["al"], mangas[i]["ap"], mangas[i]["bw"], mangas[i]["mu"], mangas[i]["mu_new"], mangas[i]["nu"], mangas[i]["kt"], mangas[i]["mal"]) for i in mangas]
+cur.executemany("INSERT INTO mappings (mdex, al, ap, bw, mu, mu_new, nu, kt, mal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", to_db)
 print("wrote "+str(len(to_db))+" to db...")
 con.commit()
 
