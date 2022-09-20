@@ -98,11 +98,19 @@ func main() {
 			optsIncludes = append(optsIncludes, "user")
 			optsIncludes = append(optsIncludes, "scanlation_group")
 
+			// Need to append content rating for 18+ works to show chapters in the feed
+			contentRating := make([]string, 0)
+			contentRating = append(contentRating, "safe")
+			contentRating = append(contentRating, "suggestive")
+			contentRating = append(contentRating, "erotica")
+			contentRating = append(contentRating, "pornographic")
+
 			// Perform our api search call to get the response
 			opts := mangadex.MangaApiGetMangaIdFeedOpts{}
 			opts.Limit = optional.NewInt32(100)
 			opts.Offset = optional.NewInt32(0)
 			opts.Includes = optional.NewInterface(optsIncludes)
+			opts.ContentRating = optional.NewInterface(contentRating)
 
 			// Robustly re-try a few times if we fail
 			resp := &http.Response{}

@@ -915,7 +915,13 @@ func (a *MangaApiService) GetMangaIdFeed(ctx context.Context, id string, localVa
 		localVarQueryParams.Add("excludedOriginalLanguage[]", parameterToString(localVarOptionals.ExcludedOriginalLanguage.Value(), "multi"))
 	}
 	if localVarOptionals != nil && localVarOptionals.ContentRating.IsSet() {
-		localVarQueryParams.Add("contentRating[]", parameterToString(localVarOptionals.ContentRating.Value(), "multi"))
+		// todo: future self, can we make arrays be smarter?
+		// todo: had to convert this to properly set the array value...
+		ratings := localVarOptionals.ContentRating.Value().([]string)
+		for _, rating := range ratings {
+			localVarQueryParams.Add("contentRating[]", parameterToString(rating, ""))
+		}
+		//localVarQueryParams.Add("contentRating[]", parameterToString(localVarOptionals.ContentRating.Value(), "multi"))
 	}
 	if localVarOptionals != nil && localVarOptionals.ExcludedGroups.IsSet() {
 		localVarQueryParams.Add("excludedGroups[]", parameterToString(localVarOptionals.ExcludedGroups.Value(), "multi"))

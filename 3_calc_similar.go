@@ -238,6 +238,7 @@ func main() {
 		// Debug check / skip mangas
 		//debugMangaIds := map[string]bool{"32d76d19-8a05-4db0-9fc2-e0b0648fe9d0": true, "d46d9573-2ad9-45b2-9b6d-45f95452d1c0": true,
 		//	"e78a489b-6632-4d61-b00b-5206f5b8b22b": true, "58bc83a0-1808-484e-88b9-17e167469e23": true, "0fa5dab2-250a-4f69-bd15-9ceea54176fa": true}
+		//debugMangaIds := map[string]bool{"e56a163f-1a4c-400b-8c1d-6cb98e63ce04": true}
 		//if _, ok := debugMangaIds[manga.Id]; !ok {
 		//	continue
 		//}
@@ -314,9 +315,9 @@ func main() {
 			}
 
 			// Skip if no chapters
-			if mangasChapterInfo[id].NumChapters < 1 {
+			if mangasChapterInfo[id].NumChapters < 1 && mangaChapterInfo.NumChapters > 0 {
 				//fmt.Printf("\u001B[1;33m\t - match %d had no chapters! -> %s (%d)\u001B[0m\n",
-				//	id, (*mangas[id].Data.Attributes.Title)["en"],mangasChapterInfo[id].NumChapters)
+				//	id, (*manga.Attributes.Title)["en"], mangasChapterInfo[id].NumChapters)
 				continue
 			}
 
@@ -335,9 +336,9 @@ func main() {
 					break
 				}
 			}
-			if !foundCommonLang {
+			if !foundCommonLang && len(mangaChapterInfo.Languages) > 0 {
 				//fmt.Printf("\u001B[1;33m\t - match %d had no commmon lang! -> %s (%s)\u001B[0m\n",
-				//	id, (*mangas[id].Data.Attributes.Title)["en"], strings.Join(mangasChapterInfo[id].Languages,","))
+				//	id, (*manga.Attributes.Title)["en"], strings.Join(mangasChapterInfo[id].Languages, ","))
 				continue
 			}
 
@@ -352,7 +353,7 @@ func main() {
 			matchData.Id = mangas[id].Id
 			matchData.Title = *mangas[id].Attributes.Title
 			matchData.ContentRating = mangas[id].Attributes.ContentRating
-			matchData.Score = float32(match.Distance) / float32(tagScoreRatio + 1.0)
+			matchData.Score = float32(match.Distance) / float32(tagScoreRatio+1.0)
 			matchData.Languages = mangasChapterInfo[id].Languages
 			similarMangaData.SimilarMatches = append(similarMangaData.SimilarMatches, matchData)
 			fmt.Printf("\t - matched to id %d (%.3f tag, %.3f desc, %.3f combined) -> %s - https://mangadex.org/title/%s\n",
