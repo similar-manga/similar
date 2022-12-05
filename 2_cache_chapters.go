@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Settings
-	skipAlreadyDownloaded := true
+	skipAlreadyDownloaded := false
 	saveRawChapterList := false
 	if saveRawChapterList {
 		err := os.MkdirAll(dirChapters, os.ModePerm)
