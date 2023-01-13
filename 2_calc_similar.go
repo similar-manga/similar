@@ -50,7 +50,7 @@ func main() {
 	ignoreDescScoreUnder := 0.01
 	acceptDescScoreOver := 0.40
 	ignoreTagsUnderCount := 2
-	minDescriptionWords := 50
+	minDescriptionWords := 15
 	err := os.MkdirAll(dirSimilar, os.ModePerm)
 	if err != nil {
 		log.Fatalf("%v", err)
@@ -238,6 +238,7 @@ func main() {
 		//debugMangaIds := map[string]bool{"32d76d19-8a05-4db0-9fc2-e0b0648fe9d0": true, "d46d9573-2ad9-45b2-9b6d-45f95452d1c0": true,
 		//	"e78a489b-6632-4d61-b00b-5206f5b8b22b": true, "58bc83a0-1808-484e-88b9-17e167469e23": true, "0fa5dab2-250a-4f69-bd15-9ceea54176fa": true}
 		//debugMangaIds := map[string]bool{"e56a163f-1a4c-400b-8c1d-6cb98e63ce04": true}
+		//debugMangaIds := map[string]bool{"ee0df4ab-1e8d-49b9-9404-da9dcb11a32a": true}
 		//if _, ok := debugMangaIds[manga.Id]; !ok {
 		//	continue
 		//}
