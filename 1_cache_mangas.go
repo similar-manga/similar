@@ -16,6 +16,9 @@ import (
 	"time"
 )
 
+// This is a global variable so we rate limit over all API calls
+var lastTimeApiCall = time.Now()
+
 func downloadMangasBySearching(dirMangas string, ctx context.Context, client *mangadex.APIClient,
 	tagId2Tag *map[string]mangadex.Tag,
 	mangasDownloaded *map[string]bool, tags []string, rating string, createdAtSince string) {
@@ -37,7 +40,6 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 	// Specify our max limit and loop through the entire API to get all manga
 	currentLimit := int32(100)
 	maxOffset := int32(10000)
-	lastTimeApiCall := time.Now()
 	for currentOffset := int32(0); currentOffset < maxOffset; currentOffset += currentLimit {
 
 		// Perform our api search call to get the response
@@ -60,29 +62,37 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 		mangaList := mangadex.MangaList{}
 		resp := &http.Response{}
 		err := errors.New("startup")
-		for retryCount := 0; retryCount <= 3 && err != nil; retryCount++ {
+		maxRetries := 10
+		for retryCount := 0; retryCount <= maxRetries && err != nil; retryCount++ {
+
+			// Pause if we need to retry as we are probably rate limited...
+			if retryCount > 0 {
+				//fmt.Printf("\u001B[1;31mretrying %d / %d times...\u001B[0m\n", retryCount, maxRetries)
+				time.Sleep(5 * time.Second)
+			}
 
 			// Rate limit if we have not waited enough
-			minMilliBetween := int64(220)
+			// NOTE: /manga has 10 reqs per 60 minutes limit (seems really slow...)
+			minMilliBetween := int64(500)
 			timeSinceLast := time.Since(lastTimeApiCall)
 			if timeSinceLast.Milliseconds() < minMilliBetween {
 				milliToWait := minMilliBetween - timeSinceLast.Milliseconds()
 				//fmt.Printf("\u001B[1;31mwaiting %d milliseconds\u001B[0m\n", milliToWait)
-				time.Sleep(time.Duration(1e6 * milliToWait))
+				time.Sleep(time.Duration(milliToWait) * time.Millisecond)
 			}
 
 			// Api call to the mangadex api (5 req per second)
 			lastTimeApiCall = time.Now()
 			mangaList, resp, err = client.MangaApi.GetSearchManga(ctx, &opts)
 			if err != nil {
-				fmt.Printf("\u001B[1;31mMANGA ERROR: %v\u001B[0m\n", err)
+				fmt.Printf("\u001B[1;31mMANGA ERROR (%d of %d): %v\u001B[0m\n", retryCount, maxRetries, err)
 			} else if resp == nil {
 				err = errors.New("invalid response object")
-				fmt.Printf("\u001B[1;31mMANGA ERROR: respose object is nil\u001B[0m\n")
+				fmt.Printf("\u001B[1;31mMANGA ERROR (%d of %d): respose object is nil\u001B[0m\n", retryCount, maxRetries)
 				continue
 			} else if resp.StatusCode != 200 && resp.StatusCode != 204 {
 				err = errors.New("invalid http error code")
-				fmt.Printf("\u001B[1;31mMANGA ERROR: http code %d\u001B[0m\n", resp.StatusCode)
+				fmt.Printf("\u001B[1;31mMANGA ERROR (%d of %d): http code %d\u001B[0m\n", retryCount, maxRetries, resp.StatusCode)
 			}
 			if err == nil {
 				resp.Body.Close()
@@ -123,7 +133,9 @@ func downloadMangasBySearching(dirMangas string, ctx context.Context, client *ma
 
 		// Update our current limit
 		// NOTE: they have coded a hard max of 10k, thus don't use the reported one...
-		maxOffset = int32(math.Min(float64(maxOffset), float64(mangaList.Total)))
+		if mangaList.Total > 0 {
+			maxOffset = int32(math.Min(float64(maxOffset), float64(mangaList.Total)))
+		}
 		currentLimit = int32(math.Min(float64(currentLimit), float64(maxOffset-currentOffset)))
 		if currentOffset%500 == 0 || currentOffset+currentLimit >= maxOffset {
 			fmt.Printf("\t - %d/%d completed....\n", currentOffset, maxOffset)
@@ -160,7 +172,7 @@ func main() {
 
 	// Create client
 	config := mangadex.NewConfiguration()
-	config.UserAgent = "similar-manga v2.2"
+	config.UserAgent = "similar-manga v2.3"
 	config.HTTPClient = &http.Client{
 		Timeout: 60 * time.Second,
 	}
@@ -229,7 +241,7 @@ func main() {
 			algoCurr++
 		}
 	}
-	for year := 2018; year <= 2022; year++ {
+	for year := 2018; year <= time.Now().Year(); year++ {
 		if algoNum == -1 || algoNum == algoCurr {
 			for month := 1; month <= 12; month++ {
 				createdAtSince := strconv.Itoa(year) + "-" + fmt.Sprintf("%02d", month) + "-01T00:00:00"

@@ -1878,6 +1878,10 @@ func (a *MangaApiService) GetSearchManga(ctx context.Context, localVarOptionals 
 	if err != nil {
 		return localVarReturnValue, localVarHttpResponse, err
 	}
+	//fmt.Println(localVarHttpResponse.Header)
+	//fmt.Println("X-RateLimit-Limit: " + localVarHttpResponse.Header.Get("X-RateLimit-Limit"))
+	//fmt.Println("X-RateLimit-Remaining: " + localVarHttpResponse.Header.Get("X-RateLimit-Remaining"))
+	//fmt.Println("X-RateLimit-Retry-After: " + localVarHttpResponse.Header.Get("X-RateLimit-Retry-After"))
 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.

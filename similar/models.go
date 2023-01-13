@@ -16,14 +16,3 @@ type SimilarManga struct {
 	UpdatedAt      string            `json:"updatedAt,omitempty"`
 }
 
-type ChapterInformation struct {
-	Id          string         `json:"id,omitempty"`
-	NumChapters int            `json:"num_chapters,omitempty"`
-	Languages   []string       `json:"languages,omitempty"`
-	Groups      []ChapterGroup `json:"groups,omitempty"`
-}
-
-type ChapterGroup struct {
-	Id   string `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
-}

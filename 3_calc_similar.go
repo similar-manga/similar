@@ -37,7 +37,6 @@ func main() {
 		algoNumMax, _ = strconv.Atoi(os.Args[3])
 	}
 	dirMangas := dirData + "manga/"
-	dirChaptersInfo := dirData + "chapter_info/"
 	dirSimilar := dirData + "similar/"
 
 	// Check that we have valid range
@@ -64,7 +63,6 @@ func main() {
 	corpusDesc := []string{}
 	corpusDescLength := []int{}
 	mangas := []mangadex.Manga{}
-	mangasChapterInfo := []similar.ChapterInformation{}
 	itemsManga, _ := ioutil.ReadDir(dirMangas)
 	for ct, file := range itemsManga {
 
@@ -87,15 +85,6 @@ func main() {
 			continue
 		}
 
-		// Load the json from file into our manga chapter struct
-		mangaChapterInfo := similar.ChapterInformation{}
-		fileMangaChapterInfo, _ := ioutil.ReadFile(dirChaptersInfo + file.Name())
-		err = json.Unmarshal(fileMangaChapterInfo, &mangaChapterInfo)
-		if err != nil {
-			fmt.Printf("MANGA CHAPTER INFO LOAD ERROR: %v (file %s)\n", err, file.Name())
-			continue
-		}
-
 		// Skip if invalid
 		if manga.Attributes.Title == nil || manga.Attributes.Description == nil {
 			continue
@@ -111,6 +100,13 @@ func main() {
 			tagText += reg.ReplaceAllString((*tag.Attributes.Name)["en"], "") + " "
 		}
 		descText := similar.CleanTitle((*manga.Attributes.Title)["en"]) + " "
+		for _, altTitle := range manga.Attributes.AltTitles {
+			if val, ok := altTitle["en"]; ok {
+				if similar.CleanTitle(val) != "" {
+					descText += similar.CleanTitle(val) + " "
+				}
+			}
+		}
 		descText += similar.CleanDescription((*manga.Attributes.Description)["en"])
 
 		// Append to the corpusDesc
@@ -118,7 +114,6 @@ func main() {
 		corpusDesc = append(corpusDesc, descText)
 		corpusDescLength = append(corpusDescLength, len(strings.Split(descText, " ")))
 		mangas = append(mangas, manga)
-		mangasChapterInfo = append(mangasChapterInfo, mangaChapterInfo)
 
 		// Debug
 		if len(mangas)%1000 == 0 {
@@ -230,10 +225,14 @@ func main() {
 		// NOTE: here we use the weighted tag CSC matrix, so we will multiply this against a one-hot-matrix
 		// NOTE: e.g. [0.7 1.0 0.0 0.0 0.9] * [0 1 0 0 1] => 1.9 score value for current against another
 		manga := mangas[j]
-		mangaChapterInfo := mangasChapterInfo[j]
 		vTagWeighted := lsiTagCSCWeighted.ColView(j)
 		numTags := int(mat.Sum(lsiTagCSC.ColView(j)))
 		vDesc := lsiDescCSC.ColView(j)
+
+		// Skip this manga if it has no description
+		if corpusDescLength[j] < minDescriptionWords {
+			continue
+		}
 
 		// Debug check / skip mangas
 		//debugMangaIds := map[string]bool{"32d76d19-8a05-4db0-9fc2-e0b0648fe9d0": true, "d46d9573-2ad9-45b2-9b6d-45f95452d1c0": true,
@@ -315,16 +314,16 @@ func main() {
 			}
 
 			// Skip if no chapters
-			if mangasChapterInfo[id].NumChapters < 1 && mangaChapterInfo.NumChapters > 0 {
-				//fmt.Printf("\u001B[1;33m\t - match %d had no chapters! -> %s (%d)\u001B[0m\n",
-				//	id, (*manga.Attributes.Title)["en"], mangasChapterInfo[id].NumChapters)
+			if mangas[id].Attributes.LastChapter != "" {
+				//fmt.Printf("\u001B[1;33m\t - match %d has no translated chapters! -> %s\u001B[0m\n", id, (*mangas[id].Attributes.Title)["en"])
 				continue
 			}
 
 			// Skip if no common languages
+			// This also enforces that the other manga has at least one chapter a user can read!
 			foundCommonLang := false
-			for _, lang1 := range mangasChapterInfo[id].Languages {
-				for _, lang2 := range mangaChapterInfo.Languages {
+			for _, lang1 := range manga.Attributes.AvailableTranslatedLanguages {
+				for _, lang2 := range mangas[id].Attributes.AvailableTranslatedLanguages {
 					if lang1 == lang2 {
 						foundCommonLang = true
 					}
@@ -336,9 +335,9 @@ func main() {
 					break
 				}
 			}
-			if !foundCommonLang && len(mangaChapterInfo.Languages) > 0 {
-				//fmt.Printf("\u001B[1;33m\t - match %d had no commmon lang! -> %s (%s)\u001B[0m\n",
-				//	id, (*manga.Attributes.Title)["en"], strings.Join(mangasChapterInfo[id].Languages, ","))
+			if !foundCommonLang && len(manga.Attributes.AvailableTranslatedLanguages) > 0 {
+				//fmt.Printf("\u001B[1;33m\t - match %d had no commmon lang! -> %s (%s) https://mangadex.org/title/%s\u001B[0m\n",
+				//	id, (*mangas[id].Attributes.Title)["en"], strings.Join(mangas[id].Attributes.AvailableTranslatedLanguages, ","), mangas[id].Id)
 				continue
 			}
 
@@ -354,7 +353,7 @@ func main() {
 			matchData.Title = *mangas[id].Attributes.Title
 			matchData.ContentRating = mangas[id].Attributes.ContentRating
 			matchData.Score = float32(match.Distance) / float32(tagScoreRatio+1.0)
-			matchData.Languages = mangasChapterInfo[id].Languages
+			matchData.Languages = mangas[id].Attributes.AvailableTranslatedLanguages
 			similarMangaData.SimilarMatches = append(similarMangaData.SimilarMatches, matchData)
 			fmt.Printf("\t - matched to id %d (%.3f tag, %.3f desc, %.3f combined) -> %s - https://mangadex.org/title/%s\n",
 				id, match.DistanceTag, match.DistanceDesc, matchData.Score, (*mangas[id].Attributes.Title)["en"], mangas[id].Id)
