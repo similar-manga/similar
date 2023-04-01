@@ -1,0 +1,45 @@
+name: build
+on: [ push ]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.16
+        id: go
+
+      - name: Checkout Codebase
+        uses: actions/checkout@v1
+
+      - name: Get Dependencies
+        run: |
+          go env -w GO111MODULE=auto
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
+
+      - name: Build
+        run: |
+          go build 1_cache_mangas.go
+          go build 2_calc_similar.go
+          go build 3_calc_mappings.go
+          go build 4_calc_mu_ids.go
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: similar_ubuntu.zip
+          path: |
+            LICENSE
+            1_cache_mangas
+            2_calc_similar
+            3_calc_mappings
+            4_calc_mu_ids
+
