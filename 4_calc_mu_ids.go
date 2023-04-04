@@ -20,8 +20,13 @@ import (
 func main() {
 
 	// Directory configuration
-	dirMangas := "D:/MANGADEX/similar_data/manga/"
-	dirMappings := "D:/MANGADEX/similar_data/mapping/"
+	dirData := "D:/MANGADEX/similar_data/"
+	if len(os.Args) == 2 {
+		dirData = os.Args[1]
+	}
+	fmt.Printf("directory %s\n", dirData)
+	dirMangas := dirData + "manga/"
+	dirMappings := dirData + "mapping/"
 	minMilliBetween := int64(600)
 	err := os.MkdirAll(dirMappings, os.ModePerm)
 	if err != nil {

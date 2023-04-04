@@ -3,6 +3,7 @@
 
 import os
 import csv
+import sys
 import sqlite3
 from shutil import copyfile
 from collections import defaultdict
@@ -10,7 +11,12 @@ from collections import defaultdict
 # parameters
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 # basedir = scriptdir + "/../../similar_data/mapping/"
-basedir = "D:/MANGADEX/similar_data/mapping/"
+basedir = "D:/MANGADEX/similar_data/"
+if len(sys.argv) == 2:
+    basedir = str(sys.argv[1])
+basedir = basedir + "/mapping/"
+print("reading directory:")
+print(basedir)
 sqlitefile = basedir+"mappings.db"
 csvfiles = {
     "al" : basedir+"anilist2mdex.csv",

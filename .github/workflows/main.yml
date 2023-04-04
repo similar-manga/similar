@@ -42,4 +42,4 @@ jobs:
             2_calc_similar
             3_calc_mappings
             4_calc_mu_ids
-
+            utils/create_sqlite.py

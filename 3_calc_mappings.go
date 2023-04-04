@@ -15,8 +15,16 @@ import (
 func main() {
 
 	// Directory configuration
-	dirMangas := "D:/MANGADEX/similar_data/manga/"
-	dirMappings := "D:/MANGADEX/similar_data/mapping/"
+
+	// Directory configuration
+	// 39147 mangas in total as of 03-19-2022
+	dirData := "D:/MANGADEX/similar_data/"
+	if len(os.Args) == 2 {
+		dirData = os.Args[1]
+	}
+	fmt.Printf("directory %s\n", dirData)
+	dirMangas := dirData + "manga/"
+	dirMappings := dirData + "mapping/"
 	updateAltCoverMapping := false
 	err := os.MkdirAll(dirMappings, os.ModePerm)
 	if err != nil {

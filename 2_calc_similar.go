@@ -36,6 +36,7 @@ func main() {
 		algoNumMin, _ = strconv.Atoi(os.Args[2])
 		algoNumMax, _ = strconv.Atoi(os.Args[3])
 	}
+	fmt.Printf("directory %s\n", dirData)
 	dirMangas := dirData + "manga/"
 	dirSimilar := dirData + "similar/"
 
