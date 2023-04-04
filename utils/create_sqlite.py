@@ -42,14 +42,15 @@ cur = con.cursor()
 
 # create table and read in data for each csv file
 # this seems to make the database be much larger then needed!
-# for table in csvfiles:
-#     cur.execute("CREATE TABLE IF NOT EXISTS "+table+" (idMdex, idExt);")
-#     with open(csvfiles[table],'r') as fin:
-#         dr = csv.DictReader(fin, fieldnames=['idExt','idMdex'])
-#         to_db = [(i['idMdex'], i['idExt']) for i in dr]
-#     cur.executemany("INSERT INTO "+table+" (idMdex, idExt) VALUES (?, ?);", to_db)
-#     print("wrote "+str(len(to_db))+" to db for "+table+"...")
-#     con.commit()
+print("database statistics")
+for table in csvfiles:
+    # cur.execute("CREATE TABLE IF NOT EXISTS "+table+" (idMdex, idExt);")
+    with open(csvfiles[table], 'r', encoding="utf8", errors='replace') as fin:
+        dr = csv.DictReader(fin, fieldnames=['idExt','idMdex'])
+        to_db = [(i['idMdex'], i['idExt']) for i in dr]
+    # cur.executemany("INSERT INTO "+table+" (idMdex, idExt) VALUES (?, ?);", to_db)
+    print("  -> "+table+" has "+str(len(to_db))+" entries")
+    # con.commit()
 
 
 # collect all manga into a large "mapping"
@@ -65,7 +66,7 @@ for table in csvfiles:
 # finally write to database
 to_db = [(i, mangas[i]["al"], mangas[i]["ap"], mangas[i]["bw"], mangas[i]["mu"], mangas[i]["mu_new"], mangas[i]["nu"], mangas[i]["kt"], mangas[i]["mal"]) for i in mangas]
 cur.executemany("INSERT INTO mappings (mdex, al, ap, bw, mu, mu_new, nu, kt, mal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", to_db)
-print("wrote "+str(len(to_db))+" to db...")
+print("wrote "+str(len(to_db))+" unique manga to db...")
 con.commit()
 
 

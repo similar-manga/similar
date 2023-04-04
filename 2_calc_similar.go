@@ -48,7 +48,7 @@ func main() {
 	}
 
 	// Settings
-	numSimToGet := 17
+	numSimToGet := 16
 	tagScoreRatio := 0.40
 	ignoreDescScoreUnder := 0.01
 	acceptDescScoreOver := 0.45
