@@ -106,6 +106,9 @@ func main() {
 			// Else lets try to extract the first int from the string
 			// This will be our API id number we will query with
 			ints := re.FindAllString(muLink, -1)
+			if len(ints) < 1 {
+				continue
+			}
 			idOriginal, err := strconv.Atoi(ints[0])
 			if err == nil {
 
